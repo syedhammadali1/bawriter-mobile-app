@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/logo.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -19,7 +19,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/logo.jpg ",
         "backgroundColor": "#ffffff"
       },
       "package": "com.syedhammadali.bawritermobileapp"
@@ -31,6 +31,15 @@
       "eas": {
         "projectId": "2abb646c-faa7-4d57-a349-1bb6c49cd92a"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
+      "expo-font"
+    ]
   }
 }

@@ -1,110 +1,167 @@
 import React from 'react'
+import { Image,Pressable,StyleSheet,Text,View} from 'react-native'
+import { Button, Checkbox, TextInput } from 'react-native-paper'
+import { appColors } from '../../util/constant';
+import { globalStyle } from '../../styles/globalStyle';
+import CustomButton from '../../components/global/CustomButton';
+import LogoImage from '../../components/global/LogoImage';
+import { textStyle } from '../../styles/textStyle';
+
 import {
-    Image,
-    KeyboardAvoidingView,
-    Pressable,
-    ScrollView,
-    StyleSheet, Text,
-    // TextInput,
-    View
-} from 'react-native'
-import { Button, TextInput } from 'react-native-paper'
-import styles from './styles/styles'
-import AuthHeader from '../../components/auth/AuthHeader';
+    useFonts,
+    Montserrat_100Thin,
+    Montserrat_200ExtraLight,
+    Montserrat_300Light,
+    Montserrat_400Regular,
+    Montserrat_500Medium,
+    Montserrat_600SemiBold,
+    Montserrat_700Bold,
+    Montserrat_800ExtraBold,
+    Montserrat_900Black,
+    Montserrat_100Thin_Italic,
+    Montserrat_200ExtraLight_Italic,
+    Montserrat_300Light_Italic,
+    Montserrat_400Regular_Italic,
+    Montserrat_500Medium_Italic,
+    Montserrat_600SemiBold_Italic,
+    Montserrat_700Bold_Italic,
+    Montserrat_800ExtraBold_Italic,
+    Montserrat_900Black_Italic,
+  } from '@expo-google-fonts/montserrat';
+
 function LogIn({ navigation }) {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+    const [rememberMe, setRememberMe] = React.useState(false);
+
+    // 
+    let [fontsLoaded] = useFonts({
+        Montserrat_100Thin,
+        Montserrat_200ExtraLight,
+        Montserrat_300Light,
+        Montserrat_400Regular,
+        Montserrat_500Medium,
+        Montserrat_600SemiBold,
+        Montserrat_700Bold,
+        Montserrat_800ExtraBold,
+        Montserrat_900Black,
+        Montserrat_100Thin_Italic,
+        Montserrat_200ExtraLight_Italic,
+        Montserrat_300Light_Italic,
+        Montserrat_400Regular_Italic,
+        Montserrat_500Medium_Italic,
+        Montserrat_600SemiBold_Italic,
+        Montserrat_700Bold_Italic,
+        Montserrat_800ExtraBold_Italic,
+        Montserrat_900Black_Italic,
+      });
+
+    // 
 
     const togglePasswordVisibility = () => {
         setSecureTextEntry(!secureTextEntry);
     };
     return (
-        <View behavior='height' style={styles.container} >
-            <AuthHeader title='Log In'/>
-            <View style={styles.subContainer}  >
+        <View behavior='height' style={globalStyle.container} >
+            
+            <LogoImage imgStyle={{marginTop:60}}/>
+            <View style={{...localStyle.subContainer,marginTop:10}}  >
                 <TextInput
-                    // label="Email"
+                    label="Username, Email or Phone Number"
                     value={email}
                     onChangeText={email => setEmail(email)}
                     mode='flat'
-                    style={styles.input}
-                    placeholder='Email'
-                    left={<TextInput.Icon icon="email" />}
+                    style={{...globalStyle.input,...localStyle.input}}
                 />
                 <TextInput
-                    // label="Email"
+                    label="Password"
                     value={password}
                     onChangeText={password => setPassword(password)}
                     mode='flat'
-                    style={styles.input}
-                    placeholder='password'
-                    left={<TextInput.Icon icon={secureTextEntry ? 'eye-off' : 'eye'} onPress={togglePasswordVisibility} />}
+                    style={{...globalStyle.input,...localStyle.input}}
+                    right={<TextInput.Icon icon={secureTextEntry ? 'eye-off' : 'eye'} onPress={togglePasswordVisibility} />}
                     secureTextEntry={secureTextEntry}
                 />
-                <Pressable style={{alignSelf:'flex-end'}} onPress={() => navigation.navigate('ForgotPassword')}>
-                    <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-                </Pressable>
-                <Button mode="contained" onPress={() => console.log('Pressed')} buttonColor='black' style={styles.loginBtn}>
-                    LOGIN
-                </Button>
-                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={{ ...styles.text, alignItems: 'center', alignSelf: 'center' }}>Don't have an account?
-                        <Pressable onPress={() => navigation.navigate('Register')}>
-                            <Text style={{ fontWeight: 'bold', color: 'purple', marginLeft: 5, justifyContent: 'center', alignSelf: 'center' }}>Register Here</Text>
+                <View style={{...localStyle.forgotPasswordTextContainer}}>
+                    <View style={{...localStyle.checkboxContainer}}>
+                        <Checkbox
+                            status={rememberMe ? 'checked' : 'unchecked'}
+                            onPress={() => {
+                                setRememberMe(!rememberMe);
+                            }}
+                        />
+                        <Text style={{...textStyle.mediumText,fontSize:14}}>
+                            Remember Me?
+                        </Text>
+                    </View>
+                    <View style={{width:'50%'}}>
+                        <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
+                            <Text style={{...textStyle.mediumText,fontSize:14,textAlign:'right',}}>Forgot Password?</Text>
                         </Pressable>
-                    </Text>
+                    </View>
                 </View>
+
+                <CustomButton style={{marginTop:20}}>
+                    LOGIN
+                </CustomButton>
+
+                <View style={localStyle.orView}>
+                    <View style={localStyle.bar} />
+                    <Text style={{ fontSize: 16 }}>or</Text>
+                    <View style={localStyle.bar} />
+                </View>
+
+                <View style={{flexDirection:'row',marginTop:20,justifyContent:'space-between'}}>
+                    <Button icon="facebook" mode="contained" style={{backgroundColor:appColors.FACEBOOKBLUE,marginHorizontal:10}} onPress={() => console.log('Pressed')}>
+                        Facebook
+                    </Button>
+                    <Button icon={require('../../../assets/images/google-logo-icon.png')} mode="outlined" onPress={() => console.log('Pressed')}>
+                       Google
+                    </Button>
+                </View>
+
+                {/* <Button mode="contained" onPress={() => navigation.navigate('Register')} buttonColor={appColors.SECONDARY} style={{...globalStyle.loginBtn,marginTop:30}}>
+      
+                </Button> */}
+                <CustomButton onPress={() => navigation.navigate('Register')} style={{marginTop:30}}>
+                    CREATE NEW ACCOUNT
+                </CustomButton>
             </View>
         </View>
     )
 }
 
-// const styles = StyleSheet.create({
-//     container: {
-//         // flex:1,
-//         // alignItems:'center'
-//     },
-//     subContainer: {
-//         alignItems: 'center',
-
-//         marginTop: 20
-//     },
-//     input: {
-//         //   borderColor: "gray",
-//         //   borderWidth: 1,
-//         //   borderRadius: 5,
-//         //   padding: 10,
-//         width: "80%",
-//         //   textAlign:'center',
-//         //   alignItems: 'center',
-//         backgroundColor: 'white',
-//         marginTop: 25
-//     },
-//     title: {
-//         fontSize: 30,
-//         fontWeight: '500',
-//         textAlign: 'center',
-//         // marginTop: 150
-//     },
-//     text: {
-//         marginTop: 20
-//     },
-//     registerText: {
-//         color: 'purple',
-//         // fontWeight
-//     },
-//     loginBtn: {
-//         width: '40%',
-//         marginTop: 50,
-//         borderRadius: 2
-//     },
-//     logo: {
-//         height: 100,
-//         width: 300,
-//         resizeMode: 'contain',
-//         marginTop: 70
-//     },
-// });
+const localStyle = StyleSheet.create({
+    subContainer:{
+        width:'100%',
+        alignItems: 'center',
+    },
+    orView:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop:30
+    },
+    bar:{
+        height:1,
+        backgroundColor:'black',
+        width:50,
+        marginLeft:20,
+        marginRight:20
+    },
+    input:{
+        marginTop:20
+    },
+    forgotPasswordTextContainer:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent:'flex-start',
+        marginTop:40
+    },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+})
 
 export default LogIn
