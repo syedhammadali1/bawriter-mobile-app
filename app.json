@@ -19,7 +19,6 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.jpg ",
         "backgroundColor": "#ffffff"
       },
       "package": "com.syedhammadali.bawritermobileapp"
