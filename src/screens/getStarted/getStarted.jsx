@@ -3,17 +3,46 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Button, Chip } from 'react-native-paper';
 import tw from 'twrnc';
 import { Dropdown } from 'react-native-element-dropdown';
-import AuthHeader from '../../components/auth/AuthHeader';
 import { appColors } from '../../util/constant';
 import { globalStyle } from '../../styles/globalStyle';
 import commonStyles from '../auth/styles/styles';
-import { useGetOrderCreateQuery } from '../../services/apiService';
+import { useGetCreateOrderQuery } from '../../services/apiService';
 
 export default function GetStarted({ navigation }) {
-  const { data, error, isLoading } = useGetOrderCreateQuery();
+  const { data, error, isLoading, isSuccess } = useGetCreateOrderQuery();
   const [selectedChip, setSelectedChip] = useState('');
   const [dropdownValue, setDropdownValue] = useState(null);
   const [pageCount, setPageCount] = useState(1);
+  const [workLevels, setWorkLevels] = useState([]);
+  const [serviceTypeData, setServiceTypeData] = useState([]);
+  const [writerListData, setWriterListData] = useState([]);
+  const [urgencyData, setUrgencyData] = useState([]);
+  const [spacing , setSpacing] = useState ([])
+
+  useEffect(() => {
+    if (isSuccess) {
+      setServiceTypeData(data.result.data.service_id_list);
+      setWriterListData(data.result.data.writer_list);
+      setUrgencyData(data.result.data.urgency_id_list);
+
+
+     const mappedWorkLevels = data.result.data.work_level_id_list.map(level => ({
+        id: level.id.toString(),
+        label: level.name,
+        value: level.id.toString()
+      }));   
+      setWorkLevels(mappedWorkLevels);
+
+
+
+      const mappedSpacing = data.result.data.spacings_list.map(spacing => ({
+        id: spacing.id.toString(),
+        label: spacing.name,
+        value: spacing.id.toString()
+      }));   
+      setSpacing(mappedSpacing)
+    }
+  }, [isSuccess, data]);
 
   const handleChipPress = (chip) => {
     setSelectedChip(chip);
@@ -25,24 +54,14 @@ export default function GetStarted({ navigation }) {
       setPageCount(pageCount - 1);
     }
   };
-  useEffect(() => {
-    // You can add any side effects here if needed
-  }, [data, error, isLoading]);
 
   if (isLoading) return <Text>Loading...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
 
-  const dropdownData = {
-    serviceType: data?.service_types.map(type => ({ label: type.name, value: type.id })) || [],
-    writers: data?.writer_list.map(writer => ({ label: `${writer.first_name} ${writer.last_name}`, value: writer.id })) || [],
-    urgency: data?.urgency_types.map(type => ({ label: type.name, value: type.id })) || [],
-  };
-
-
   return (
     <View style={[tw`flex-1`, { ...globalStyle.main }]}>
       <ScrollView contentContainerStyle={commonStyles.container2} style={globalStyle.curve_container}>
-        <Text style={[tw`font-bold`, { ...globalStyle.heading_four }]}>Step 1/3 TYPE OF WORK AND DEADLINE</Text>
+        <Text style={[tw`font-bold`, { ...globalStyle.heading_four }]}>Step 1/3 TYPE OF WORK AND DEADLINE</Text>
 
         <View style={tw`mb-2`}>
           <Text style={[tw`font-bold`, { ...globalStyle.dropdown_heading }]}>
@@ -72,10 +91,7 @@ export default function GetStarted({ navigation }) {
             placeholderStyle={tw`text-gray-600`}
             selectedTextStyle={tw`text-black`}
             iconStyle={tw`text-gray-600`}
-            data={writerList.map(writer => ({
-              label: `${writer.first_name} ${writer.last_name}`,
-              value: writer.id.toString()
-            }))}
+            data={writerListData.map(item => ({ label: item.first_name + item.last_name, value: item.id.toString() }))}
             maxHeight={100}
             labelField="label"
             valueField="value"
@@ -88,25 +104,25 @@ export default function GetStarted({ navigation }) {
         <Text style={[tw`font-bold`, { ...globalStyle.dropdown_heading }]}>
           Work level
         </Text>
-        <View style={tw`flex flex-row flex-wrap gap-[10px] justify-center mb-2`}>
-          {['High School', 'College', 'Ph.D.', 'Undergraduate', 'Masters'].map((level) => (
+        <View style={tw`flex flex-row	flex-wrap gap-[5px] justify-around mb-2`}>
+          {workLevels.map(level => (
             <Chip
-              key={level}
-              onPress={() => handleChipPress(level)}
+              key={level.id}
+              onPress={() => handleChipPress(level.label)}
               style={[
                 tw`rounded-0`,
                 {
-                  backgroundColor: selectedChip === level ? '#FDD043' : '#FFFFFF',
-                  borderColor: selectedChip === level ? '#FFFFFF' : '#5597D1',
+                  backgroundColor: selectedChip === level.label ? '#FDD043' : '#FFFFFF',
+                  borderColor: selectedChip === level.label ? '#FFFFFF' : '#5597D1',
                   borderWidth: 1
                 }
               ]}
-              textStyle={{ color: selectedChip === level ? '#FFFFFF' : '#000000' }}
+              textStyle={{ color: selectedChip === level.label ? '#FFFFFF' : '#000000' }}
             >
-              {selectedChip === level && (
+              {selectedChip === level.label && (
                 <Text style={tw`absolute top-1 right-1`}>✓</Text>
               )}
-              {level}
+              {level.label}
             </Chip>
           ))}
         </View>
@@ -131,27 +147,27 @@ export default function GetStarted({ navigation }) {
               Spacing
             </Text>
             <View style={tw`flex flex-row my-2`}>
-              {['Double-Spaced', 'Single-Spaced'].map((level) => (
+              {spacing.map((spacing) => (
                 <Chip
-                  key={level}
-                  onPress={() => handleChipPress(level)}
+                  key={spacing.id}
+                  onPress={() => handleChipPress(spacing.label)}
                   style={[
                     tw`rounded-0`,
                     {
-                      backgroundColor: selectedChip === level ? '#FDD043' : '#FFFFFF',
-                      borderColor: selectedChip === level ? '#FFFFFF' : '#5597D1',
+                      backgroundColor: selectedChip === spacing.label ? '#FDD043' : '#FFFFFF',
+                      borderColor: selectedChip === spacing.label ? '#FFFFFF' : '#5597D1',
                       borderWidth: 1
                     }
                   ]}
                   textStyle={[
                     tw`text-[10px] m-1`,
-                    { color: selectedChip === level ? '#FFFFFF' : '#000000' }
+                    { color: selectedChip === spacing.label ? '#FFFFFF' : '#000000' }
                   ]}
                 >
-                  {selectedChip === level && (
+                  {selectedChip === spacing.label && (
                     <Text style={tw`absolute top-1 right-1`}>✓</Text>
                   )}
-                  {level}
+                  {spacing.label}
                 </Chip>
               ))}
             </View>
