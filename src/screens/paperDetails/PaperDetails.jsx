@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Image, ScrollView, Text, TouchableOpacity, View, Pressable } from 'react-native'
+import { Image, ScrollView, Text, TouchableOpacity, View, Pressable, StyleSheet } from 'react-native'
 import { Button,Chip, DataTable, RadioButton, SegmentedButtons, TextInput } from 'react-native-paper'
 import tw from 'twrnc';
 import AuthHeader from '../../components/auth/AuthHeader'
@@ -11,13 +11,24 @@ import Checkbox from 'expo-checkbox';
 import uploadicon from '../../../assets/images/icons/upload.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { setOrderData } from '../../redux/orderReducer';
-
+import * as DocumentPicker from 'expo-document-picker';
 
 export default function PaperDetails({navigation}) {
     const [title, setTitle] = React.useState("");
     const [Instructions, setInstructions] = React.useState("");
     const [isModalVisible, setModalVisible] = useState(false);
     const [isSelected, setSelection] = useState(false);
+
+    const [document, setDocument] = useState(null);
+
+    const pickDocument = async () => {
+      let result = await DocumentPicker.getDocumentAsync({});
+      console.log(result,'result');
+      console.log(result?.assets[0],'result?.assets[0]');
+      if (result.type === 'success') {
+        setDocument(result?.assets[0]);
+      }
+    };
 
     const dispatch = useDispatch();
     const orderData = useSelector((state) => state.order);
@@ -99,7 +110,7 @@ export default function PaperDetails({navigation}) {
                                 icon={() => <Image source={uploadicon} style={{ width: 30, height: 30 }} />}
                                 textColor='#000'
                                 buttonColor='#EFEEEE'
-                                onPress={()=>console.log ('presses')}
+                                onPress={()=>pickDocument()}
                              >Upload File</Button>
                              <Text style={tw`my-5`}>Selected File</Text>
                         </View>

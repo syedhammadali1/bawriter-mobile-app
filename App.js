@@ -34,7 +34,7 @@ export default function App() {
       <NavigationContainer theme={MyTheme}>
         <PaperProvider >
           <View style={styles.container}>
-            <Stack.Navigator initialRouteName="LogIn" 
+            <Stack.Navigator initialRouteName="PaperDetails" 
               screenOptions={{ 
                 headerStyle:{
                   backgroundColor:appColors.PRIMARY,
