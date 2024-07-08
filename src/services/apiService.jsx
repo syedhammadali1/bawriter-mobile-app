@@ -7,12 +7,12 @@
       baseUrl: 'http://dashboard.bestassignmentwriters.co.uk/api',
       prepareHeaders: async (headers) => {
         const token = await AuthService.getTokenExist();
-        console.log('Retrieved token:', token); // Debug log
+        // console.log('Retrieved token:', token); // Debug log
         if (token) {
           headers.set('Authorization', `Bearer ${token}`);
         }
         headers.set('Content-Type', 'application/json');
-        console.log('Headers:', headers); // Debug log
+        // console.log('Headers:', headers); // Debug log
         return headers;
       },
     }),

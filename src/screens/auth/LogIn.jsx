@@ -60,13 +60,11 @@ function LogIn({ navigation }) {
         if (valid) {
           try {
             const response = await login({ email, password }).unwrap();
-            console.log('Login response:', response);
             if (response.result && response.result.data && response.result.data.token) {
               const token = response.result.data.token;
               const username = response.result.data.user;
               await AuthService.saveAuthData(token, username); // Save token and username
               dispatch(setToken(token));
-              console.log('Token dispatched:', token);
             } else {
               throw new Error('Invalid response structure');
             }
@@ -98,7 +96,6 @@ function LogIn({ navigation }) {
               }
             }
           } catch (error) {
-            console.error("Login error:", error);
             alert("Login failed. Please try again later.");
           }
         }

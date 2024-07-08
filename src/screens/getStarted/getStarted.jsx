@@ -49,7 +49,7 @@ export default function GetStarted({ navigation }) {
       }));
       setSpacing(mappedSpacing);
     } else if (error) {
-      console.error('API error:', error);
+      // console.error('API error:', error);
     }
   }, [isSuccess, data]);
 
@@ -96,20 +96,20 @@ export default function GetStarted({ navigation }) {
       pages: pageCount,
       spacing: selectedSpacingChip,
     }));
-    console.log("Order Data saved:", {
-      serviceType: dropdownServiceType,
-      writer: dropdownWriter,
-      workLevel: selectedWorkLevelChip,
-      urgency: dropdownUrgency,
-      pages: pageCount,
-      spacing: selectedSpacingChip,
-    });
+    // console.log("Order Data saved:", {
+    //   serviceType: dropdownServiceType,
+    //   writer: dropdownWriter,
+    //   workLevel: selectedWorkLevelChip,
+    //   urgency: dropdownUrgency,
+    //   pages: pageCount,
+    //   spacing: selectedSpacingChip,
+    // });
     navigation.navigate('PaperDetails');
   };
 
   
   if (isLoading) {
-    console.log('Loading data...');
+    // console.log('Loading data...');
     return (
       <View style={tw`flex-1 justify-center items-center`}>
         <Text>Loading...</Text>
@@ -118,7 +118,7 @@ export default function GetStarted({ navigation }) {
   }
 
   if (error) {
-    console.error('Error loading data:', error);
+    // console.error('Error loading data:', error);
     return (
       <View style={tw`flex-1 justify-center items-center`}>
         <Text>Error loading data</Text>
