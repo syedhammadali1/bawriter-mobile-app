@@ -109,7 +109,7 @@ export const globalStyle = StyleSheet.create({
         fontSize:20, 
         paddingVertical:20,
         paddingHorizontal:25,
-        marginVertical:10,
+        marginVertical:5,
         borderBottomWidth:2,
         borderBottomColor:'#5597D1'
     },

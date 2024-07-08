@@ -9,6 +9,11 @@ import tw from 'twrnc';
 import AuthHeader from '../../components/auth/AuthHeader';
 import Checkbox from 'expo-checkbox';
 import { useLoginMutation } from '../../services/apiService';
+import { useDispatch } from 'react-redux';
+import AuthService from '../../services/AuthService';
+import { setToken } from '../../redux/authReducer';
+
+
 
 function LogIn({ navigation }) {
     const [email, setEmail] = useState("");
@@ -20,6 +25,7 @@ function LogIn({ navigation }) {
     const [passwordError, setPasswordError] = useState("");
     const [generalError, setGeneralError] = useState("");
     const [login, { isLoading }] = useLoginMutation();
+    const dispatch = useDispatch();
 
     const togglePasswordVisibility = () => {
         setSecureTextEntry(!secureTextEntry);
@@ -32,62 +38,73 @@ function LogIn({ navigation }) {
 
     const handleLogin = async () => {
         let valid = true;
-
+      
         if (!validateEmail(email)) {
-            setEmailError("Please enter a valid email address.");
-            setPasswordError("");
-            setGeneralError("");
-            valid = false;
+          setEmailError("Please enter a valid email address.");
+          setPasswordError("");
+          setGeneralError("");
+          valid = false;
         } else {
-            setEmailError("");
+          setEmailError("");
         }
-
+      
         if (password.trim() === "") {
-            setPasswordError("Password cannot be empty.");
-            setEmailError("");
-            setGeneralError("");
-            valid = false;
+          setPasswordError("Password cannot be empty.");
+          setEmailError("");
+          setGeneralError("");
+          valid = false;
         } else {
-            setPasswordError("");
+          setPasswordError("");
         }
-
+      
         if (valid) {
-            try {
-                const response = await login({ email, password }).unwrap();
-                console.log('Login response:', response);
-
-                if (response.status_code == 200) {
-                    setEmail("");
-                    setPassword("");
-                    setEmailError("");
-                    setPasswordError("");
-                    setGeneralError("");
-                    navigation.navigate('OrderDetails');
-                } else {
-                    if (response && response.status_code === 401) {
-                        setGeneralError("The provided credentials do not match our records.");
-                        setPasswordError("");
-                        setEmailError("");
-                    } else if (response && response.status_code === 422) {
-                        setEmailError("");
-                        setGeneralError("");
-                        response.error.forEach(err => {
-                            if (err.field === "password") {
-                                setPasswordError(err.message);
-                            }
-                        });
-                    } else {
-                        setGeneralError(response.message || "Login failed. Please try again later.");
-                        setEmailError("");
-                        setPasswordError("");
-                    }
-                }
-            } catch (error) {
-                console.error("Login error:", error);
-                alert("Login failed. Please try again later.");
+          try {
+            const response = await login({ email, password }).unwrap();
+            console.log('Login response:', response);
+            if (response.result && response.result.data && response.result.data.token) {
+              const token = response.result.data.token;
+              const username = response.result.data.user;
+              await AuthService.saveAuthData(token, username); // Save token and username
+              dispatch(setToken(token));
+              console.log('Token dispatched:', token);
+            } else {
+              throw new Error('Invalid response structure');
             }
+            if (response.status_code === 200) {
+              setEmail("");
+              setPassword("");
+              setEmailError("");
+              setPasswordError("");
+              setGeneralError("");
+              navigation.navigate('getStarted');
+
+            } else {
+              if (response && response.status_code === 401) {
+                setGeneralError("The provided credentials do not match our records.");
+                setPasswordError("");
+                setEmailError("");
+              } else if (response && response.status_code === 422) {
+                setEmailError("");
+                setGeneralError("");
+                response.error.forEach(err => {
+                  if (err.field === "password") {
+                    setPasswordError(err.message);
+                  }
+                });
+              } else {
+                setGeneralError(response.message || "Login failed. Please try again later.");
+                setEmailError("");
+                setPasswordError("");
+              }
+            }
+          } catch (error) {
+            console.error("Login error:", error);
+            alert("Login failed. Please try again later.");
+          }
         }
-    };
+      };
+      
+
 
     return (
         <View style={globalStyle.main}>

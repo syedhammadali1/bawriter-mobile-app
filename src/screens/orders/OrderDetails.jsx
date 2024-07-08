@@ -4,14 +4,13 @@ import commonStyles from '../auth/styles/styles';
 import { globalStyle } from '../../styles/globalStyle';
 import { appColors } from '../../util/constant';
 import { Button, Card, Searchbar } from 'react-native-paper';
-import { FlatList, Image, ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 import tw from 'twrnc';
 import searchicon from '../../../assets/images/icons/search-icon.png';
 import { useGetOrderDetailsQuery } from '../../services/apiService';
 
 export default function OrderDetails({ navigation }) {
     const { data: orderDetails, error, isLoading } = useGetOrderDetailsQuery(2);
-
     const [searchQuery, setSearchQuery] = useState('');
 
     if (isLoading) {
@@ -25,7 +24,7 @@ export default function OrderDetails({ navigation }) {
     if (error) {
         return (
           <View style={tw`flex-1 justify-center items-center`}>
-            <Text>Error fetching order details</Text>
+            <Text style={tw`text-red-500`}>An error occurred: {error.message}</Text>
           </View>
         );
     }
@@ -55,32 +54,36 @@ export default function OrderDetails({ navigation }) {
             <ScrollView contentContainerStyle={commonStyles.container} keyboardDismissMode="on-drag" style={tw`bg-white`}>
                 <View>
                     <View>
-                        {Array.isArray(orderDetails) && orderDetails.map((order, index) => (
-                            <Card key={index} style={{ ...globalStyle.order_card }}>
-                                <View style={{...globalStyle.order_card_inner}}>
-                                    <Text style={{...globalStyle.order_card_text}}>
-                                        Project Code : {order.projectCode}
-                                    </Text>
-                                    <Text>
-                                        {order.id}
-                                    </Text>
-                                </View>
-                                <Text style={tw`tracking-[1px] text-[10px]`}>
-                                    {order.application}
-                                </Text>
-                                <Text style={tw`tracking-[1px] text-[10px]`}>
-                                    {order.date}
-                                </Text>
-                                <View style={{ ...globalStyle.card_cta }}>
-                                    <View>
-                                        <Text style={[tw`tracking-[2px] text-[12px]`, { color: order.statusColor }]}>{order.status}</Text>
+                        {Array.isArray(orderDetails) && orderDetails.length > 0 ? (
+                            orderDetails.map((order, index) => (
+                                <Card key={index} style={{ ...globalStyle.order_card }}>
+                                    <View style={{...globalStyle.order_card_inner}}>
+                                        <Text style={{...globalStyle.order_card_text}}>
+                                            Project Code : {order.projectCode}
+                                        </Text>
+                                        <Text>
+                                            {order.id}
+                                        </Text>
                                     </View>
-                                    <View>
-                                        <Button style={tw`tracking-[1px] text-[#000000] bg-[#FDD043]`}>View More</Button>
+                                    <Text style={tw`tracking-[1px] text-[10px]`}>
+                                        {order.application}
+                                    </Text>
+                                    <Text style={tw`tracking-[1px] text-[10px]`}>
+                                        {order.date}
+                                    </Text>
+                                    <View style={{ ...globalStyle.card_cta }}>
+                                        <View>
+                                            <Text style={[tw`tracking-[2px] text-[12px]`, { color: order.statusColor }]}>{order.status}</Text>
+                                        </View>
+                                        <View>
+                                            <Button style={tw`tracking-[1px] text-[#000000] bg-[#FDD043]`}>View More</Button>
+                                        </View>
                                     </View>
-                                </View>
-                            </Card>
-                        ))}
+                                </Card>
+                            ))
+                        ) : (
+                            <Text style={tw`text-center text-red-500`}>No order details found or an error occurred.</Text>
+                        )}
                     </View>
                 </View>
             </ScrollView>

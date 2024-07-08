@@ -35,6 +35,10 @@ const Register = ({ navigation }) => {
         return emailPattern.test(email);
     };
 
+    const validatePhoneNumber = (phone_number) => {
+        const phonePattern = /^[0-9\s-()+]*$/;
+        return phonePattern.test(phone_number)
+    }
     const fields = [
         {
             name: 'first_name',
@@ -61,7 +65,7 @@ const Register = ({ navigation }) => {
             name: 'phone_number',
             label: 'Phone Number',
             value: formState.phone_number,
-            validate: (text) => text.trim() !== '',
+            validate: validatePhoneNumber,
             errorMessage: 'Phone Number is required'
         },
         {

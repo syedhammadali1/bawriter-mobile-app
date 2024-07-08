@@ -54,9 +54,7 @@ export default function App() {
             }}
             
             >
-              <Stack.Screen name="LogIn" component={LogIn}
-                options={{ title: 'LOGIN' }}
-              />
+              <Stack.Screen name="LogIn" component={LogIn} options={{ title: 'LOGIN' }}/>
               <Stack.Screen name="Register" component={Register}  options={{ title: 'REGISTER' }} />
               <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{title:'Forget Password'}}/>
               <Stack.Screen name="ResetPassword" component={ResetPassword} options={{title:'Reset Password'}}/>
