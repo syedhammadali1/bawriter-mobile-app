@@ -19,6 +19,7 @@ import getStarted from './src/screens/getStarted/getStarted';
 import PaperDetails from './src/screens/paperDetails/PaperDetails';
 import { Provider } from 'react-redux';
 import store from './src/store';
+import PayPalWebView from './src/services/PayPalWebView';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -54,9 +55,10 @@ export default function App() {
             }}
             
             >
-              <Stack.Screen name="LogIn" component={LogIn}
-                options={{ title: 'LOGIN' }}
-              />
+          
+              <Stack.Screen name="LogIn" component={LogIn}options={{ title: 'LOGIN' }} />
+  
+               <Stack.Screen name="PayPalPayment" component={PayPalWebView} />
               <Stack.Screen name="Register" component={Register}  options={{ title: 'REGISTER' }} />
               <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{title:'Forget Password'}}/>
               <Stack.Screen name="ResetPassword" component={ResetPassword} options={{title:'Reset Password'}}/>
