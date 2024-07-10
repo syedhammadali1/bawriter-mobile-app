@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { appColors } from "../util/constant";
 import { main } from "react-devtools";
-import LogoImage from "../components/global/LogoImage";
+
 import { Dropdown } from "react-native-element-dropdown";
 
 export const globalStyle = StyleSheet.create({
