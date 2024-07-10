@@ -5,6 +5,7 @@
     reducerPath: 'apiService',
     baseQuery: fetchBaseQuery({
       baseUrl: 'http://dashboard.bestassignmentwriters.co.uk/api',
+      // baseUrl: 'http://10.0.2.2:8000/api',
       prepareHeaders: async (headers) => {
         const token = await AuthService.getTokenExist();
         // console.log('Retrieved token:', token); // Debug log
@@ -68,22 +69,12 @@
         query: () => '/order/create',
       }),
       uploadFile: builder.mutation({
-        query: (file) => {
-          const formData = new FormData();
-          formData.append('file', {
-            uri: file.uri,
-            name: file.name,
-            type: file.mimeType,
-          });
-          return {
+        query: ({file}) => ({
             url: '/attachments/upload',
             method: 'POST',
-            body: formData,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          };
-        },
+            body: file,
+
+        }),
       }),
     }),
   });

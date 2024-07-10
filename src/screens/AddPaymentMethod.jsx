@@ -4,17 +4,21 @@ import AuthHeader from '../components/auth/AuthHeader'
 import { appColors } from '../util/constant'
 import commonStyles from './auth/styles/styles'
 import { globalStyle } from '../styles/globalStyle'
-import { Button, RadioButton, TextInput } from 'react-native-paper'
+import { ActivityIndicator, Button, RadioButton, TextInput } from 'react-native-paper'
 import mastericon from '../../assets/images/icons/mastercard.png'
 import paypalicon from '../../assets/images/icons/paypal.png'
 import visaicon from '../../assets/images/icons/visa.png'
 import bankicon from '../../assets/images/icons/bank.png'
 import tw from 'twrnc';
 
-
 const AddPaymentMethods = ({navigation}) => {
     const [checked, setChecked] = React.useState('first');
 
+    const handlePayPalPayment = () => {
+      console.log('pressed handle payment');
+          navigation.navigate('PayPalPayment', { amount: '30.00' }); 
+        };
+ 
     return (
         <View style={globalStyle.main}>
 
@@ -27,7 +31,7 @@ const AddPaymentMethods = ({navigation}) => {
                     <Pressable onPress={() => console.log('Pressed')} style={globalStyle.paymentIcon}>
                         <Image source={mastericon} />     
                     </Pressable >
-                    <Pressable onPress={() => console.log('Pressed')} style={globalStyle.paymentIcon}>
+                    <Pressable onPress={handlePayPalPayment} style={globalStyle.paymentIcon}>
                         <Image source={paypalicon} />
                     </Pressable >
                     <Pressable onPress={() => console.log('Pressed')} style={globalStyle.paymentIcon}>
@@ -74,9 +78,12 @@ const AddPaymentMethods = ({navigation}) => {
                     <Button mode="contained"  onPress={() => navigation.navigate('PaymentMethods')} buttonColor={appColors.SECONDARY} style={{ ...commonStyles.loginBtn, marginTop: 50 }}>
                         continue
                     </Button>
+                
             </ScrollView>
         </View>
     )
 }
 
 export default AddPaymentMethods
+
+
