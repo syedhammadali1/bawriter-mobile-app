@@ -73,13 +73,15 @@
           formData.append('file', {
             uri: file.uri,
             name: file.name,
-            type: file.type,
+            type: file.mimeType,
           });
-  
           return {
             url: '/attachments/upload',
             method: 'POST',
             body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           };
         },
       }),
