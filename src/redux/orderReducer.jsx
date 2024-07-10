@@ -1,3 +1,4 @@
+// orderReducer.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -15,8 +16,18 @@ const orderSlice = createSlice({
   name: 'order',
   initialState,
   reducers: {
-    setOrderData: (state, action) => {
-      return { ...state, ...action.payload };
+    setOrderData(state, action) {
+      return {
+        ...state,
+        serviceType: action.payload.serviceType || state.serviceType,
+        writer: action.payload.writer || state.writer,
+        workLevel: action.payload.workLevel || state.workLevel,
+        urgency: action.payload.urgency || state.urgency,
+        pages: action.payload.pages || state.pages,
+        spacing: action.payload.spacing || state.spacing,
+        title: action.payload.title || state.title,
+        instructions: action.payload.instructions || state.instructions,
+      };
     },
   },
 });

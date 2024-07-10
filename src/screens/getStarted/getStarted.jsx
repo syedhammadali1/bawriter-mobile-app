@@ -86,27 +86,25 @@ export default function GetStarted({ navigation }) {
       Alert.alert('Error', 'All fields are required.');
       return;
     }
-
-
+  
+    const selectedServiceType = serviceTypeData.find(item => item.id.toString() === dropdownServiceType);
+    const selectedWriter = writerListData.find(item => item.id.toString() === dropdownWriter);
+    const selectedWorkLevel = workLevels.find(level => level.value === selectedWorkLevelChip);
+    const selectedUrgency = urgencyData.find(item => item.id.toString() === dropdownUrgency);
+    const selectedSpacing = spacing.find(space => space.value === selectedSpacingChip);
+  
     dispatch(setOrderData({
-      serviceType: dropdownServiceType,
-      writer: dropdownWriter,
-      workLevel: selectedWorkLevelChip,
-      urgency: dropdownUrgency,
+      serviceType: selectedServiceType,
+      writer: selectedWriter,
+      workLevel: selectedWorkLevel,
+      urgency: selectedUrgency,
       pages: pageCount,
-      spacing: selectedSpacingChip,
+      spacing: selectedSpacing,
     }));
-    // console.log("Order Data saved:", {
-    //   serviceType: dropdownServiceType,
-    //   writer: dropdownWriter,
-    //   workLevel: selectedWorkLevelChip,
-    //   urgency: dropdownUrgency,
-    //   pages: pageCount,
-    //   spacing: selectedSpacingChip,
-    // });
+  
     navigation.navigate('PaperDetails');
   };
-
+  
   
   if (isLoading) {
     // console.log('Loading data...');

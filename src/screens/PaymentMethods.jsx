@@ -12,7 +12,7 @@ import tw from 'twrnc';
 
 
 const PaymentMethods = ({navigation}) => {
-    const [checked, setChecked] = React.useState('first');
+    const [checked, setChecked] = React.useState('second');
 
     return (
         <View style={tw`bg-[#FDD043]`}>
@@ -22,7 +22,7 @@ const PaymentMethods = ({navigation}) => {
 
                 <View>
 
-                    <View style={globalStyle.selectPaymentMethod}>
+                    {/* <View style={globalStyle.selectPaymentMethod}>
                         <Image source={mastericon} />
                         <Text>Master Card</Text>
                         <RadioButton
@@ -30,7 +30,7 @@ const PaymentMethods = ({navigation}) => {
                             status={ checked === 'first' ? 'checked' : 'unchecked' }
                             onPress={() => setChecked('first')}
                         />
-                    </View>
+                    </View> */}
                     <View style={globalStyle.selectPaymentMethod}>
                         <Image source={paypalicon} />
                         <Text>Pay Pal</Text>
@@ -40,7 +40,7 @@ const PaymentMethods = ({navigation}) => {
                             onPress={() => setChecked('second')}
                         />
                     </View>
-                    <View style={globalStyle.selectPaymentMethod}>
+                    {/* <View style={globalStyle.selectPaymentMethod}>
                         <Image source={visaicon} />
                         <Text>Visa</Text>
                         <RadioButton
@@ -48,7 +48,7 @@ const PaymentMethods = ({navigation}) => {
                             status={ checked === 'third' ? 'checked' : 'unchecked' }
                             onPress={() => setChecked('third')}
                         />
-                    </View>
+                    </View> */}
                 </View>
 
                 <Button mode="contained" onPress={() => navigation.navigate('Balance')} buttonColor={appColors.SECONDARY} style={[{ ...commonStyles.loginBtn}]}>
