@@ -12,32 +12,35 @@ import uploadicon from '../../../assets/images/icons/upload.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { setOrderData } from '../../redux/orderReducer';
 import * as DocumentPicker from 'expo-document-picker';
-import { useUploadFileMutation } from '../../services/apiService';
+import * as FileSystem from 'expo-file-system';
+import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 
 
 export default function PaperDetails({navigation}) {
     const [title, setTitle] = React.useState("");
+    const [loading, setLoading] = React.useState(false);
     const [Instructions, setInstructions] = React.useState("");
     const [isModalVisible, setModalVisible] = useState(false);
     const [isSelected, setSelection] = useState(false);
     const [document, setDocument] = useState(null);
+    const [binaryData, setBinaryData] = useState(null);
     const [errors, setErrors] = useState({
       title: '',
       instructions: '',
       terms: '',
     });
 
-    const [uploadFile, { isLoading }] = useUploadFileMutation();
-
     const pickDocument = async () => {
       try {
         let result = await DocumentPicker.getDocumentAsync({});
-        if (result.type === 'success') {
+        console.log(result,'result');
+        if (result.canceled === false) {
           const file = result.assets[0];
           setDocument(file.name);
+          await convertToBinary(file.uri, file.name, file.mimeType,file.size);
     
-          const response = await uploadFile(file).unwrap(); // Assuming uploadFile is a RTK Query mutation
-          console.log('File upload response:', response);
+          // const response = await uploadFile(file).unwrap(); // Assuming uploadFile is a RTK Query mutation
+          // console.log('File upload response:', file);
           
           // Handle successful upload (e.g., show success message)
         } else {
@@ -50,6 +53,52 @@ export default function PaperDetails({navigation}) {
     };
     
 
+    const convertToBinary = async (fileUri, fileName, mimeType, size) => {
+      try {
+        const fileInfo = await FileSystem.getInfoAsync(fileUri);
+        if (fileInfo.exists) {
+          const responseData = await uploadFile(fileUri, fileName, mimeType);          
+        } else {
+          console.log('File does not exist');
+        }
+      } catch (error) {
+        console.error('Error reading file:', error);
+      }
+    };
+    
+
+    const uploadFile = async (fileUri, fileName, mimeType) => {
+      try {
+        const formData = new FormData();
+        formData.append('file', {
+          uri: fileUri,
+          name: fileName,
+          type: mimeType,
+        });
+        setLoading(true);
+        const response = await fetch('http://dashboard.bestassignmentwriters.co.uk/api/attachments/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        const responseData = await response.json();
+    
+        if (!responseData.status_code == 200) {
+          throw new Error(`Error uploading file: ${response.statusText}`);
+        }
+        setLoading(false);
+    
+
+        console.log(responseData,'responseData');
+        return responseData;
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        throw error;
+      }
+    };
+    
 
 
     const dispatch = useDispatch();
@@ -95,6 +144,7 @@ export default function PaperDetails({navigation}) {
         <View style={[tw`flex-1`,{...globalStyle.main}]}>
             <ScrollView contentContainerStyle={commonStyles.container2}  style={globalStyle.curve_container}>
                 <Text style={[tw`font-bold`,{...globalStyle.heading_four}]}>Step 2/ 3 ADDITIONAL PAPER DETAILS</Text>
+                
                 <View style={tw`mb-5`}>
                     <TextInput
                         label="Title *"
@@ -119,13 +169,14 @@ export default function PaperDetails({navigation}) {
                             textColor="#000"
                             buttonColor="#EFEEEE"
                             onPress={pickDocument}
-                            disabled={isLoading} // Disable button during loading
+                           disabled={loading}
                           >
                             Upload File
                           </Button>
-                          {document && (
-                            <Text style={tw`my-5`}>Uploaded File URL: {document}</Text>
-                          )}
+                     
+                          {loading && <ActivityIndicator animating={true} size="large" />}
+                          {document && <Text style={tw`mt-5`}>Uploaded File: {document}</Text>}
+
                       </View>
                     <Text style={tw`color-[#5597D1] my-2 text-[12px] font-semibold`}>Previous</Text>
                     <View style={tw`flex-row`}>
@@ -138,7 +189,13 @@ export default function PaperDetails({navigation}) {
                         <Text style={tw`text-[10px] pl-1`}>I agree to the Terms and Conditions and Privacy Policy� </Text>
                     </View>
                 </View>
-                <Button mode="contained" onPress={handleNextClick} buttonColor={appColors.SECONDARY} style={{ ...commonStyles.loginBtn}}>Pay Now</Button>
+                <Button 
+                mode="contained" 
+                onPress={handleNextClick} 
+                buttonColor={appColors.SECONDARY} 
+                style={{ ...commonStyles.loginBtn}}
+                disabled={loading}
+                >Pay Now</Button>
             </ScrollView>
             <Modal
                 isVisible={isModalVisible}
