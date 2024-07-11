@@ -123,6 +123,21 @@ export default function PaperDetails({navigation}) {
           toggleModal();
         }
       };
+
+
+      const Urgency = orderData.urgency?.name;
+      const Spacing = orderData.spacing?.label;
+      const Pages = orderData.pages;
+      
+      const WriterFee = (orderData.spacing?.label === 'Double-spaced' 
+        ? orderData.writer.staff_price.double_space_price 
+        : orderData.writer.staff_price.single_space_price).toFixed(2);
+      
+      const WorkLevel_charges = ((parseFloat(WriterFee) / 100) * orderData.workLevel?.percentage_to_add).toFixed(2);
+      const Urgency_Charges = ((parseFloat(WriterFee) / 100) * orderData.urgency?.percentage_to_add).toFixed(2);
+      const Unit_Price = (parseFloat(WriterFee) + parseFloat(WorkLevel_charges) + parseFloat(Urgency_Charges)).toFixed(2);
+      const Total = ((parseFloat(WriterFee) + parseFloat(Urgency_Charges) + parseFloat(Unit_Price)) * Pages).toFixed(2);
+      
     return (
         <View style={[tw`flex-1`,{...globalStyle.main}]}>
             <ScrollView contentContainerStyle={commonStyles.container2}  style={globalStyle.curve_container}>
@@ -190,25 +205,25 @@ export default function PaperDetails({navigation}) {
             <View style={tw`my-3`}>
               <Text style={tw`text-[16px] font-bold text-[#5597D1]`}>Service</Text>
               <Text style={tw`text-[13px] font-semibold text-[#5597D1]`}>{orderData.serviceType?.name}</Text>
-              <Text style={tw`text-[10px] text-[#5597D1]`}> {orderData.workLevel?.label} Work level</Text>
+              <Text style={tw`text-[10px] text-[#5597D1]`}> {orderData.workLevel?.name} Work level</Text>
             </View>
             <View style={tw`my-2`}>
-              <Text style={globalStyle.order_description_text}>Urgency:{orderData.urgency?.name}</Text>
-              <Text style={globalStyle.order_description_text}>Spacing Type: {orderData.spacing?.label}</Text>
-              <Text style={globalStyle.order_description_text}>Pages: {orderData.pages}</Text>
-              <Text style={globalStyle.order_description_text}>Writer Fee: $2.00</Text>
-              <Text style={globalStyle.order_description_text}>Work Level Charges: $0.05</Text>
-              <Text style={globalStyle.order_description_text}>Urgency Charges: $0.19</Text>
-              <Text style={globalStyle.order_description_text}>Unit Rate: $2.24</Text>
+              <Text style={globalStyle.order_description_text}>Urgency :<Text style={globalStyle.order_description_light_text}> {Urgency}</Text></Text>
+              <Text style={globalStyle.order_description_text}>Spacing Type :<Text style={globalStyle.order_description_light_text}> {Spacing}</Text></Text>
+              <Text style={globalStyle.order_description_text}>Pages : <Text  style={globalStyle.order_description_light_text}>{Pages}</Text></Text>
+              <Text style={globalStyle.order_description_text}>Writer Fee : <Text  style={globalStyle.order_description_light_text}>${WriterFee} </Text></Text>
+              <Text style={globalStyle.order_description_text}>Work Level Charges :  <Text  style={globalStyle.order_description_light_text}>$ {WorkLevel_charges}</Text></Text>
+              <Text style={globalStyle.order_description_text}>Urgency Charges : <Text  style={globalStyle.order_description_light_text}>${Urgency_Charges}</Text></Text>
+              <Text style={globalStyle.order_description_text}>Unit Rate : <Text  style={globalStyle.order_description_light_text}>${Unit_Price}</Text></Text>
             </View>
             <View style={tw`my-5`}>
               <View style={tw`flex-row justify-between px-3 py-2 border-t-2 border-[#FDD043]`}>
                 <Text style={tw`font-bold text-[#5597D1]`}>Amount</Text>
-                <Text>$20.00</Text>
+                <Text style={tw`text-[#5597D1]`}>${Total}</Text>
               </View>
               <View style={tw`flex-row justify-between px-3 py-2 border-t-2 border-[#FDD043]`}>
                 <Text style={tw`font-bold text-[#5597D1]`}>Total</Text>
-                <Text>$20.00</Text>
+                <Text style={tw`text-[#5597D1]`}>${Total}</Text>
               </View>
             </View>
             <Button mode="contained" onPress={() => navigation.navigate('PaymentMethods')} buttonColor={appColors.SECONDARY} style={{ ...commonStyles.loginBtn }}>

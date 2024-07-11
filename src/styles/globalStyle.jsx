@@ -181,6 +181,9 @@ export const globalStyle = StyleSheet.create({
         marginBottom:5,
         fontWeight: "500"
     },
+    order_description_light_text:{
+        fontWeight: "300"
+    },
     order_cash:{
         borderBottomWidth:1,
         borderTopWidth:1,

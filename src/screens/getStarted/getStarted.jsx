@@ -27,8 +27,6 @@ export default function GetStarted({ navigation }) {
   const dispatch = useDispatch();
   const orderData = useSelector((state) => state.order);
 
-
-
   useEffect(() => {
     if (isSuccess) {
       setServiceTypeData(data.result.data.service_id_list);
@@ -37,7 +35,11 @@ export default function GetStarted({ navigation }) {
 
       const mappedWorkLevels = data.result.data.work_level_id_list.map(level => ({
         id: level.id.toString(),
-        label: level.name,
+        name: level.name,
+        percentage_to_add: level.percentage_to_add,
+        inactive: level.inactive,
+        created_at: level.created_at,
+        updated_at: level.updated_at,
         value: level.id.toString()
       }));
       setWorkLevels(mappedWorkLevels);
@@ -49,18 +51,13 @@ export default function GetStarted({ navigation }) {
       }));
       setSpacing(mappedSpacing);
     } else if (error) {
-      // console.error('API error:', error);
+      console.error('API error:', error);
     }
   }, [isSuccess, data]);
-
-
-
 
   useEffect(() => {
     console.log("Order Data:", orderData);
   }, [orderData]);
-
-
 
   const handleChipPress = (type, chip) => {
     if (type === 'workLevel') {
@@ -70,8 +67,6 @@ export default function GetStarted({ navigation }) {
     }
   };
 
-
-
   const pageIncrement = () => setPageCount(pageCount + 1);
   const pageDecrement = () => {
     if (pageCount > 1) {
@@ -79,20 +74,18 @@ export default function GetStarted({ navigation }) {
     }
   };
 
-
-
   const handleNextClick = () => {
     if (!dropdownServiceType || !dropdownWriter || !selectedWorkLevelChip || !dropdownUrgency || !selectedSpacingChip) {
       Alert.alert('Error', 'All fields are required.');
       return;
     }
-  
+
     const selectedServiceType = serviceTypeData.find(item => item.id.toString() === dropdownServiceType);
     const selectedWriter = writerListData.find(item => item.id.toString() === dropdownWriter);
     const selectedWorkLevel = workLevels.find(level => level.value === selectedWorkLevelChip);
     const selectedUrgency = urgencyData.find(item => item.id.toString() === dropdownUrgency);
     const selectedSpacing = spacing.find(space => space.value === selectedSpacingChip);
-  
+
     dispatch(setOrderData({
       serviceType: selectedServiceType,
       writer: selectedWriter,
@@ -101,13 +94,11 @@ export default function GetStarted({ navigation }) {
       pages: pageCount,
       spacing: selectedSpacing,
     }));
-  
+
     navigation.navigate('PaperDetails');
   };
-  
-  
+
   if (isLoading) {
-    // console.log('Loading data...');
     return (
       <View style={tw`flex-1 justify-center items-center`}>
         <Text>Loading...</Text>
@@ -116,7 +107,6 @@ export default function GetStarted({ navigation }) {
   }
 
   if (error) {
-    // console.error('Error loading data:', error);
     return (
       <View style={tw`flex-1 justify-center items-center`}>
         <Text>Error loading data</Text>
@@ -188,7 +178,7 @@ export default function GetStarted({ navigation }) {
               {selectedWorkLevelChip === level.value && (
                 <Text style={tw`absolute top-1 right-1`}>✓</Text>
               )}
-              {level.label}
+              {level.name}
             </Chip>
           ))}
         </View>
