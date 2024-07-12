@@ -60,7 +60,7 @@ export default function App() {
   
                <Stack.Screen name="PayPalPayment" component={PayPalWebView} />
               <Stack.Screen name="Register" component={Register}  options={{ title: 'REGISTER' }} />
-              <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{title:'Forget Password'}}/>
+               <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{title:'Forget Password'}}/>
               <Stack.Screen name="ResetPassword" component={ResetPassword} options={{title:'Reset Password'}}/>
               <Stack.Screen name="Otp" component={Otp} options={{title:'OTP'}}/>
               <Stack.Screen name="AddPaymentMethods" component={AddPaymentMethods} options={{title:'Add Payment Method'}}/>
@@ -68,7 +68,15 @@ export default function App() {
               <Stack.Screen name="Balance" component={Balance} options={{title:'Balance'}}/>
               <Stack.Screen name="OrderDetails" component={OrderDetails}  options={{ title: 'Order Details', headerLeft: () => null }}/>
               <Stack.Screen name="OrderSummary" component={OrderSummary} options={{title:'Order Summary'}}/>
-              <Stack.Screen name="getStarted" component={getStarted} options={{title:'Lets get started on your project!'}}/>
+              <Stack.Screen 
+              name="getStarted"
+              component={getStarted} 
+              options={{
+                title:'Lets get started on your project!',
+                headerLeft: () => null, // This removes the back button
+                gestureEnabled: false,
+              }}
+              />
               <Stack.Screen name="PaperDetails" component={PaperDetails} options={{title:'Lets get started on your project!'}}/>
 
             </Stack.Navigator>

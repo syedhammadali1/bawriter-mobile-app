@@ -178,7 +178,7 @@ export default function PaperDetails({navigation}) {
                             <Checkbox
                                 value={isSelected}
                                 onValueChange={setSelection}
-                                style={tw`bg-#00000`}
+                                style={tw`bg-#000000`}
                                 error={!!errors.terms}
                                 />
                         <Text style={tw`text-[10px] pl-1`}>I agree to the Terms and Conditions and Privacy Policy� </Text>

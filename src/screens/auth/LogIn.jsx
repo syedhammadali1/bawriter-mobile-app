@@ -137,7 +137,7 @@ function LogIn({ navigation }) {
                                 <Checkbox
                                     value={isSelected}
                                     onValueChange={setSelection}
-                                    style={tw`bg-#00000`}
+                                    style={tw`bg-#000000`}
                                 />
                                 <Text style={{ ...textStyle.mediumText, fontSize: 14, paddingLeft: 5 }}>
                                     Remember Me?
@@ -164,14 +164,14 @@ function LogIn({ navigation }) {
                             <View style={localStyle.bar} />
                         </View>
 
-                        <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-between' }}>
+                        {/* <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-between' }}>
                             <Button icon="facebook" mode="contained" style={{ backgroundColor: appColors.FACEBOOKBLUE, marginHorizontal: 10 }} onPress={() => console.log('Pressed')}>
                                 Facebook
                             </Button>
                             <Button icon={require('../../../assets/images/google-logo-icon.png')} mode="outlined" onPress={() => console.log('Pressed')}>
                                 Google
                             </Button>
-                        </View>
+                        </View> */}
 
                         <CustomButton onPress={() => navigation.navigate('Register')} style={globalStyle.custom_button}>
                             CREATE NEW ACCOUNT

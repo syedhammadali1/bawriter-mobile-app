@@ -34,7 +34,7 @@
       }),
       register: builder.mutation({
         query: (userData) => ({
-          url: '/auth/register',
+          url: '/auth/registerr',
           method: 'POST',
           body: userData,
         }),

@@ -173,7 +173,7 @@ export default function GetStarted({ navigation }) {
                   borderWidth: 1
                 }
               ]}
-              textStyle={{ color: selectedWorkLevelChip === level.value ? '#FFFFFF' : '#000000' }}
+              textStyle={{ color: "#000000" }}
             >
               {selectedWorkLevelChip === level.value && (
                 <Text style={tw`absolute top-1 right-1`}>✓</Text>
@@ -188,12 +188,12 @@ export default function GetStarted({ navigation }) {
             <Text style={[tw`font-bold`, { ...globalStyle.dropdown_headingsmall }]}>
               Number of pages
             </Text>
-            <View style={tw`flex flex-row justify-between my-2 bg-gray-200 px-3`}>
-              <TouchableOpacity onPress={pageDecrement}>
+            <View style={tw`flex flex-row justify-between my-2 bg-gray-200 `}>
+              <TouchableOpacity onPress={pageDecrement} style={tw`px-3 w-[25%]`}> 
                 <Text style={tw`text-lg font-bold`}>-</Text>
               </TouchableOpacity>
               <Text style={tw`text-lg font-bold bg-white w-[50%] text-center my-1`}>{pageCount}</Text>
-              <TouchableOpacity onPress={pageIncrement}>
+              <TouchableOpacity onPress={pageIncrement} style={tw`px-2 w-[25%]`}>
                 <Text style={tw`text-lg font-bold`}>+</Text>
               </TouchableOpacity>
             </View>
@@ -217,7 +217,7 @@ export default function GetStarted({ navigation }) {
                   ]}
                   textStyle={[
                     tw`text-[10px] m-1`,
-                    { color: selectedSpacingChip === space.value ? '#FFFFFF' : '#000000' }
+                    { color: '#000000' }
                   ]}
                 >
                   {selectedSpacingChip === space.value && (
