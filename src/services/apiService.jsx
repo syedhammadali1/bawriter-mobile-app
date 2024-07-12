@@ -76,6 +76,14 @@
 
         }),
       }),
+      createOrder: builder.mutation({
+        query: ({formData}) => ({
+            url: '/order/store',
+            method: 'POST',
+            body: formData,
+
+        }),
+      }),
     }),
   });
 
@@ -89,6 +97,7 @@
     useGetOrderDetailQuery,
     useDownloadAttachmentQuery,
     useGetCreateOrderQuery,
-    useUploadFileMutation 
+    useUploadFileMutation,
+    useOrderStoreMutation 
   } = apiService;
   export default apiService;

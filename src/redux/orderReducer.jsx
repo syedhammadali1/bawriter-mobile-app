@@ -10,6 +10,7 @@ const initialState = {
   spacing: null,
   title: null,
   instructions: null,
+  uploadedFile: null,
 };
 
 const orderSlice = createSlice({
@@ -29,9 +30,13 @@ const orderSlice = createSlice({
         instructions: action.payload.instructions || state.instructions,
       };
     },
+    setUploadedFile: (state, action) => {
+      state.uploadedFile = action.payload;
+    },
+
   },
 });
 
-export const { setOrderData } = orderSlice.actions;
+export const { setOrderData, setUploadedFile  } = orderSlice.actions;
 
 export default orderSlice.reducer;
