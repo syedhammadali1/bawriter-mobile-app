@@ -10,7 +10,7 @@ const PayPalWebView = ({ route, navigation }) => {
 
     if (event.url.includes('/success')) {
       Alert.alert('Payment Successful', 'Your payment has been successfully processed.');
-      navigation.goBack(); 
+      navigation.navigate('OrderDetails'); 
     } else if (event.url.includes('/cancel')) {
       Alert.alert('Payment Cancelled', 'Your payment has been cancelled.');
       navigation.goBack();
