@@ -19,17 +19,20 @@ import moment from 'moment/moment';
 export default function OrderSummary({ route, navigation }) {
   const { orderId } = route.params || {};
 
-  const [attachmentId, setAttachmentId] = useState(null);
-
   const downloadAttachment = async (url, displayName) => {
     const downloadDest = `${FileSystem.documentDirectory}${displayName}`;
+  
     try {
       const { uri } = await FileSystem.downloadAsync(url, downloadDest);
       alert('Success', `Attachment downloaded to: ${uri}`);
     } catch (err) {
+      console.error('Download error:', err);
       alert('Error', `Failed to download attachment: ${err.message}`);
     }
   };
+
+  console.log(FileSystem.documentDirectory);
+
 
   if (!orderId) {
     return (
@@ -58,7 +61,7 @@ export default function OrderSummary({ route, navigation }) {
 
     const formattedPostedDate = data && moment(data.result.data.created_at).format('Do MMM YYYY');
     const formattedDeadlineDate = data && moment(data.result.data.dead_line).format('Do MMM YYYY');
-    
+
     const attachments = data.result.data.order_attachments || [];
 
 
@@ -84,7 +87,7 @@ export default function OrderSummary({ route, navigation }) {
         return (
           <>
           <View style={tw`bg-gray-300 px-3 py-5 mt-5 rounded shadow-lg shadow-slate-700 mt-10`}>
-            <Text style={tw`text-[15px] font-bold text-center mb-5`}>Project Code : {data.result.data.number}</Text>
+            <Text style={tw`text-[15px] font-bold text-center mb-5`}>Project Code : {data.result.data.order_no}</Text>
             <Text style={globalStyle.order_description_text}> Project Title : {data.result.data.title}</Text>
             <Text style={globalStyle.order_description_text}> Posted Date : {formattedPostedDate}</Text>
             <Text style={globalStyle.order_description_text}> Deadline Date : {formattedDeadlineDate}</Text>
@@ -97,13 +100,13 @@ export default function OrderSummary({ route, navigation }) {
                 <View key={index} style={tw`mb-4`}>
                   <Text style={tw`mb-5 text-center`}>File Attachment: {attachment.display_name}</Text>
                   <Button
-                    mode="outlined"
-                    onPress={() => downloadAttachment(attachment.name, attachment.display_name)}
-                    style={tw`mx-10`}
-                    textColor='#000'
-                  >
-                    Download Attachment
-                  </Button>
+  mode="outlined"
+  onPress={() => downloadAttachment(data.result.data.order_attachments[0].name, data.result.data.order_attachments[0].display_name)}
+  style={tw`mx-10`}
+  textColor='#000'>
+  Download Attachment
+</Button>
+
                 </View>
               ))
             ) : (

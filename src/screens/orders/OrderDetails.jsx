@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, ScrollView } from 'react-native';
+import { View, Text, Image, ScrollView, RefreshControl } from 'react-native';
 import { Button, Card, Searchbar } from 'react-native-paper';
 import tw from 'twrnc';
 import moment from 'moment';
@@ -11,10 +11,21 @@ import searchicon from '../../../assets/images/icons/search-icon.png';
 import { useGetOrderlistQuery } from '../../services/apiService';
 
 export default function OrderDetails({ navigation }) {
-  const { data, error, isLoading } = useGetOrderlistQuery(2);
+  const { data, error, isLoading, refetch } = useGetOrderlistQuery(2);
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
-  if (isLoading) {
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch(); // Ensure this resolves
+    } catch (err) {
+      console.error("Failed to refresh:", err);
+    }
+    setRefreshing(false);
+  };
+
+  if (isLoading && !refreshing) {
     return (
       <View style={tw`flex-1 justify-center items-center`}>
         <Text>Loading...</Text>
@@ -33,19 +44,19 @@ export default function OrderDetails({ navigation }) {
   const list = data?.result?.data || [];
 
   const statusColors = {
-    'New': '#007bff', // Primary
-    'In progress': '#17a2b8', // Info
-    'Submitted for approval': '#17a2b8', // Info
-    'Requested for revision': '#ffc107', // Warning
-    'Completed': '#28a745', // Success
-    'On hold': '#6c757d', // Secondary
-    'Canceled': '#343a40', // Dark
-    'Refunded': '#F53B00', // Danger
-    'Payment needs approval': '#F53B00', // Danger
-    'Payment Disapproved': '#343a40', // Dark
-    'Pending Payment':'#F53B00'
+    'New': '#007bff',
+    'In progress': '#17a2b8',
+    'Submitted for approval': '#17a2b8',
+    'Requested for revision': '#ffc107',
+    'Completed': '#28a745',
+    'On hold': '#6c757d',
+    'Canceled': '#343a40',
+    'Refunded': '#F53B00',
+    'Payment needs approval': '#F53B00',
+    'Payment Disapproved': '#343a40',
+    'Pending Payment': '#F53B00'
   };
-  
+
   return (
     <View style={tw`bg-[#FDD043] flex-1`}>
       <View style={globalStyle.curve_container}>
@@ -66,17 +77,21 @@ export default function OrderDetails({ navigation }) {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={commonStyles.container} keyboardDismissMode="on-drag" style={tw`bg-white`}>
+      <ScrollView
+        contentContainerStyle={commonStyles.container}
+        keyboardDismissMode="on-drag"
+        style={tw`bg-white`}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {list.length > 0 ? (
           list.map((order, index) => (
             <Card key={index} style={{ ...globalStyle.order_card }}>
               <View style={{ ...globalStyle.order_card_inner }}>
                 <Text style={{ ...globalStyle.order_card_text }}>
-                  Project Code: {order.number}
+                  Project Code: {order.order_no}
                 </Text>
-                {/* <Text>
-                  {order.id}
-                </Text> */}
               </View>
               <Text style={tw`tracking-[1px] text-[15px] font-medium`}>
                 {order.title}
@@ -86,8 +101,8 @@ export default function OrderDetails({ navigation }) {
               </Text>
               <View style={{ ...globalStyle.card_cta }}>
                 <View>
-                    <Text style={[tw`tracking-[1px] text-[10px]`, { color: statusColors[order.status] }]}>
-                        {order.status}
+                  <Text style={[tw`tracking-[1px] text-[10px]`, { color: statusColors[order.status] }]}>
+                    {order.status}
                   </Text>
                 </View>
                 <View>
@@ -95,7 +110,6 @@ export default function OrderDetails({ navigation }) {
                     style={tw`tracking-[2px] text-[#000000] bg-[#FDD043] px-3`}
                     onPress={() => navigation.navigate('OrderSummary', { orderId: order.id })}
                     textColor="#000"
-                
                   >
                     View More
                   </Button>
