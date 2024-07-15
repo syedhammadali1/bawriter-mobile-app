@@ -1,196 +1,281 @@
-import React, { useState } from 'react'
-import { Image, ScrollView, Text, TouchableOpacity, View, Pressable, StyleSheet } from 'react-native'
-import { Button,Chip, DataTable, RadioButton, SegmentedButtons, TextInput } from 'react-native-paper'
+import React, { useState, useEffect } from 'react';
+import { Image, ScrollView, Text, View } from 'react-native';
+import { Button, TextInput, ActivityIndicator, MD2Colors } from 'react-native-paper';
 import tw from 'twrnc';
-import AuthHeader from '../../components/auth/AuthHeader'
-import { appColors } from '../../util/constant'
-import { globalStyle } from '../../styles/globalStyle'
-import commonStyles from '../auth/styles/styles';
+import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-native-modal';
 import Checkbox from 'expo-checkbox';
 import uploadicon from '../../../assets/images/icons/upload.png';
-import { useDispatch, useSelector } from 'react-redux';
-import { setOrderData } from '../../redux/orderReducer';
+import { setOrderData, setUploadedFile } from '../../redux/orderReducer';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
-import { ActivityIndicator, MD2Colors } from 'react-native-paper';
-export default function PaperDetails({navigation}) {
-    const [title, setTitle] = React.useState("");
-    const [loading, setLoading] = React.useState(false);
-    const [Instructions, setInstructions] = React.useState("");
+import { globalStyle } from '../../styles/globalStyle';
+import { appColors } from '../../util/constant';
+import commonStyles from '../auth/styles/styles';
+import { useCreateOrderMutation } from '../../services/apiService';
+// import { unwrapResult } from '@reduxjs/toolkit'; // Ensure you have imported unwrapResult from RTK
+export default function PaperDetails({ navigation }) {
+    const [title, setTitle] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [Instructions, setInstructions] = useState('');
     const [isModalVisible, setModalVisible] = useState(false);
     const [isSelected, setSelection] = useState(false);
     const [document, setDocument] = useState(null);
-    const [binaryData, setBinaryData] = useState(null);
     const [errors, setErrors] = useState({
-      title: '',
-      instructions: '',
-      terms: '',
+        title: '',
+        instructions: '',
+        terms: '',
     });
-    const pickDocument = async () => {
-      try {
-        let result = await DocumentPicker.getDocumentAsync({});
-        console.log(result,'result');
-        if (result.canceled === false) {
-          const file = result.assets[0];
-          setDocument(file.name);
-          await convertToBinary(file.uri, file.name, file.mimeType,file.size);
-          // const response = await uploadFile(file).unwrap(); // Assuming uploadFile is a RTK Query mutation
-          // console.log('File upload response:', file);
-          // Handle successful upload (e.g., show success message)
-        } else {
-          console.log('Document picking cancelled');
-        }
-      } catch (error) {
-        console.error('Error picking/uploading document:', error);
-        // Handle error (e.g., show error message to user)
-      }
-    };
-    const convertToBinary = async (fileUri, fileName, mimeType, size) => {
-      try {
-        const fileInfo = await FileSystem.getInfoAsync(fileUri);
-        if (fileInfo.exists) {
-          const responseData = await uploadFile(fileUri, fileName, mimeType);
-        } else {
-          console.log('File does not exist');
-        }
-      } catch (error) {
-        console.error('Error reading file:', error);
-      }
-    };
-    const uploadFile = async (fileUri, fileName, mimeType) => {
-      try {
-        const formData = new FormData();
-        formData.append('file', {
-          uri: fileUri,
-          name: fileName,
-          type: mimeType,
-        });
-        setLoading(true);
-        const response = await fetch('http://dashboard.bestassignmentwriters.co.uk/api/attachments/upload', {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'Accept': 'application/json',
-          },
-        });
-        const responseData = await response.json();
-        if (!responseData.status_code == 200) {
-          throw new Error(`Error uploading file: ${response.statusText}`);
-        }
-        setLoading(false);
-        console.log(responseData,'responseData');
-        return responseData;
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        throw error;
-      }
-    };
+    const [isPickingDocument, setIsPickingDocument] = useState(false);
     const dispatch = useDispatch();
     const orderData = useSelector((state) => state.order);
+    console.log(orderData,'orderData');
+    const [createOrder, { isLoading }] = useCreateOrderMutation();
+    useEffect(() => {
+        console.log('Order Data:', orderData);
+    }, [orderData]);
+    const pickDocument = async () => {
+        if (isPickingDocument) {
+            return;
+        }
+        setIsPickingDocument(true);
+        try {
+            let result = await DocumentPicker.getDocumentAsync({});
+            console.log(result, 'result');
+            if (result && !result.cancelled) {
+                const file = result.assets[0];
+                setDocument(file.name);
+                await convertToBinary(file.uri, file.name, file.mimeType, file.size);
+            } else {
+                console.log('Document picking cancelled');
+            }
+        } catch (error) {
+            console.error('Error picking/uploading document:', error);
+        } finally {
+            setIsPickingDocument(false);
+        }
+    };
+    const convertToBinary = async (fileUri, fileName, mimeType, size) => {
+        try {
+            const fileInfo = await FileSystem.getInfoAsync(fileUri);
+            if (fileInfo.exists) {
+                await uploadFile(fileUri, fileName, mimeType, fileInfo);
+            } else {
+                console.log('File does not exist');
+            }
+        } catch (error) {
+            console.error('Error reading file:', error);
+        }
+    };
+    const uploadFile = async (fileUri, fileName, mimeType, fileInfo) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', {
+                uri: fileUri,
+                name: fileName,
+                type: mimeType,
+            });
+            setLoading(true);
+            const response = await fetch('http://dashboard.bestassignmentwriters.co.uk/api/attachments/upload', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+            const responseData = await response.json();
+            console.log(responseData?.result?.data,'responseDatafile');
+            if (response.ok) {
+                dispatch(
+                    setUploadedFile({
+                        name: responseData?.result?.data?.name,
+                        display_name: responseData?.result?.data?.display_name, // Assuming the API returns the URL of the uploaded file
+                        type: mimeType,
+                        size: fileInfo.size,
+                    })
+                );
+            } else {
+                throw new Error(`Error uploading file: ${responseData.error}`);
+            }
+            setLoading(false);
+            console.log(responseData, 'responseData');
+            return responseData;
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            setLoading(false);
+            throw error;
+        }
+    };
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
-      const handleNextClick = () => {
+    const handleNextClick = () => {
         let hasErrors = false;
         let newErrors = { ...errors };
         if (!title.trim()) {
-          newErrors.title = 'Title is required';
-          hasErrors = true;
+            newErrors.title = 'Title is required';
+            hasErrors = true;
         } else {
-          newErrors.title = '';
+            newErrors.title = '';
         }
         if (!Instructions.trim()) {
-          newErrors.instructions = 'Instructions are required';
-          hasErrors = true;
+            newErrors.instructions = 'Instructions are required';
+            hasErrors = true;
         } else {
-          newErrors.instructions = '';
+            newErrors.instructions = '';
         }
         if (!isSelected) {
-          newErrors.terms = 'You must agree to the terms';
-          hasErrors = true;
+            newErrors.terms = 'You must agree to the terms';
+            hasErrors = true;
         } else {
-          newErrors.terms = '';
+            newErrors.terms = '';
         }
         setErrors(newErrors);
         if (!hasErrors) {
-          dispatch(
-            setOrderData({
-              title: title,
-              instructions: Instructions,
-            })
-          );
-          toggleModal();
+            dispatch(
+                setOrderData({
+                    title: title,
+                    instructions: Instructions,
+                })
+            );
+            toggleModal();
         }
-      };
+    };
+    const Urgency = orderData.urgency?.name || '';
+    const Spacing = orderData.spacing?.label || '';
+    const Pages = orderData.pages || 0;
+    const WriterFee = orderData.writer
+        ? (orderData.spacing?.label === 'Double-spaced'
+            ? orderData.writer.staff_price.double_space_price
+            : orderData.writer.staff_price.single_space_price
+        ).toFixed(2)
+        : '0.00';
+    const WorkLevel_charges = orderData.writer
+        ? ((parseFloat(WriterFee) / 100) * orderData.workLevel?.percentage_to_add).toFixed(2)
+        : '0.00';
+        console.log(WorkLevel_charges,'WorkLevel_charges');
 
-
-      const Urgency = orderData.urgency?.name;
-      const Spacing = orderData.spacing?.label;
-      const Pages = orderData.pages;
-      
-      const WriterFee = (orderData.spacing?.label === 'Double-spaced' 
-        ? orderData.writer.staff_price.double_space_price 
-        : orderData.writer.staff_price.single_space_price).toFixed(2);
-      
-      const WorkLevel_charges = ((parseFloat(WriterFee) / 100) * orderData.workLevel?.percentage_to_add).toFixed(2);
-      const Urgency_Charges = ((parseFloat(WriterFee) / 100) * orderData.urgency?.percentage_to_add).toFixed(2);
-      const Unit_Price = (parseFloat(WriterFee) + parseFloat(WorkLevel_charges) + parseFloat(Urgency_Charges)).toFixed(2);
-      const Total = ((parseFloat(WriterFee) + parseFloat(Urgency_Charges) + parseFloat(Unit_Price)) * Pages).toFixed(2);
-      
+    const Urgency_Charges = orderData.writer
+        ? ((parseFloat(WriterFee) / 100) * orderData.urgency?.percentage_to_add).toFixed(2)
+        : '0.00';
+    const Unit_Price = orderData.writer
+        ? (parseFloat(WriterFee) + parseFloat(WorkLevel_charges) + parseFloat(Urgency_Charges)).toFixed(2)
+        : '0.00';
+    const Total = orderData.writer
+        ? ((parseFloat(Unit_Price)) * Pages).toFixed(2)
+        : '0.00';
+    const OrderCreate = async () => {
+        setLoading(true);
+        try {
+            const formData = {
+                title: title,
+                instruction: Instructions,
+                service_id: orderData.serviceType?.id || '',
+                work_level_id: orderData.workLevel?.id || '',
+                urgency_id: orderData.urgency?.id || '',
+                dead_line: orderData.writer?.updated_at || '', // Replace with your actual deadline value
+                quantity: Pages,
+                files_data: [
+                    {
+                        upload: {
+                            data: {
+                                name: orderData.uploadedFile?.name || '',
+                                display_name: 'Uploaded File',
+                            },
+                        },
+                    },
+                ],
+                base_price: parseFloat(Unit_Price),
+                spacing_type: Spacing,
+                work_level_price: parseFloat(WorkLevel_charges),
+                urgency_price: parseFloat(Urgency_Charges),
+                unit_price: parseFloat(Unit_Price),
+                amount: parseFloat(Total),
+                sub_total: parseFloat(Total),
+                total: parseFloat(Total),
+                writer_model: {
+                    id: orderData.writer?.id || '',
+                },
+            };
+            console.log(formData,'formData');
+            // const response = await fetch('http://dashboard.bestassignmentwriters.co.uk/api/order/store', {
+            //   method: 'POST',
+            //   headers: {
+            //     'Content-Type': 'application/json'
+            //   },
+            //   body: JSON.stringify(formData),
+            // });
+            // const responseData = await response.json();
+            setLoading(true);
+            const resultAction = await createOrder({formData:JSON.stringify(formData)});
+            // console.log(responseData,'responseData');
+            // const result = unwrapResult(resultAction); // Extracts the payload or throws an error
+            console.log('Order created:', resultAction); // Log or handle the result as needed
+            setLoading(false);
+            navigation.navigate('PaymentMethods');
+        } catch (error) {
+            console.error('Error sending order:', error);
+            // Handle error, show an error message, etc.
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
-        <View style={[tw`flex-1`,{...globalStyle.main}]}>
-            <ScrollView contentContainerStyle={commonStyles.container2}  style={globalStyle.curve_container}>
-                <Text style={[tw`font-bold`,{...globalStyle.heading_four}]}>Step 2/ 3 ADDITIONAL PAPER DETAILS</Text>
-                <View style={tw`mb-5`}>
-                    <TextInput
-                        label="Title *"
-                        value={title}
-                        onChangeText={title => setTitle(title)}
-                        mode='flat'
-                        style={[tw`my-2`,{...globalStyle.input}]}
-                        error={!!errors.title}/>
-                    <TextInput
-                        label="Specific Instructions *"
-                        value={Instructions}
-                        onChangeText={Instructions => setInstructions(Instructions)}
-                        mode='flat'
-                        style={[tw`my-2`,{...globalStyle.input}]}
-                        multiline={true}
-                        error={!!errors.instructions}
+        <View style={[tw`flex-1`, globalStyle.main]}>
+            <ScrollView contentContainerStyle={tw`py-4 px-5`} style={globalStyle.curve_container}>
+                <Text style={[tw`font-bold text-[#5597D1] text-xl mb-5`]}>Step 2/3 ADDITIONAL PAPER DETAILS</Text>
+                <TextInput
+                    label="Title *"
+                    value={title}
+                    onChangeText={(title) => setTitle(title)}
+                    mode="outlined"
+                    style={tw`mb-3`}
+                    error={!!errors.title}
+                />
+                {errors.title ? <Text style={tw`text-red-500 mb-3`}>{errors.title}</Text> : null}
+                <TextInput
+                    label="Specific Instructions *"
+                    value={Instructions}
+                    onChangeText={(instructions) => setInstructions(instructions)}
+                    mode="outlined"
+                    multiline
+                    numberOfLines={4}
+                    style={tw`mb-3`}
+                    error={!!errors.instructions}
+                />
+                {errors.instructions ? <Text style={tw`text-red-500 mb-3`}>{errors.instructions}</Text> : null}
+                <Button
+                    mode="contained"
+                    icon={() => <Image source={uploadicon} style={{ width: 30, height: 30 }} />}
+                    onPress={pickDocument}
+                    loading={loading || isPickingDocument}
+                    disabled={loading || isPickingDocument}
+                    style={tw`mt-3`}
+                >
+                    Upload File
+                </Button>
+                {document ? <Text style={tw`mt-3 text-gray-700`}>Uploaded File: {document}</Text> : null}
+                {errors.terms ? <Text style={tw`text-red-500 mt-3`}>{errors.terms}</Text> : null}
+                <View style={tw`flex-row items-center mt-3`}>
+                    <Checkbox
+                        value={isSelected}
+                        onValueChange={(value) => setSelection(value)}
+                        color="#5597D1"
+                        style={tw`mr-2`}
                     />
-                      <View style={tw`my-5`}>
-                          <Button
-                            mode="contained"
-                            icon={() => <Image source={uploadicon} style={{ width: 30, height: 30 }} />}
-                            textColor="#000"
-                            buttonColor="#EFEEEE"
-                            onPress={pickDocument}
-                           disabled={loading}
-                          >
-                            Upload File
-                          </Button>
-                          {loading && <ActivityIndicator animating={true} size="large" />}
-                          {document && <Text style={tw`mt-5`}>Uploaded File: {document}</Text>}
-                      </View>
-                    <Text style={tw`color-[#5597D1] my-2 text-[12px] font-semibold`}>Previous</Text>
-                    <View style={tw`flex-row`}>
-                            <Checkbox
-                                value={isSelected}
-                                onValueChange={setSelection}
-                                style={tw`bg-#000000`}
-                                error={!!errors.terms}
-                                />
-                        <Text style={tw`text-[10px] pl-1`}>I agree to the Terms and Conditions and Privacy Policy� </Text>
-                    </View>
+                    <Text style={tw`text-sm text-gray-700`}>
+                        I agree to the Terms and Conditions and Privacy Policy
+                    </Text>
                 </View>
                 <Button
-                mode="contained"
-                onPress={handleNextClick}
-                buttonColor={appColors.SECONDARY}
-                style={{ ...commonStyles.loginBtn}}
-                disabled={loading}
-                >Pay Now</Button>
+                    mode="contained"
+                    onPress={handleNextClick}
+                    disabled={loading}
+                    style={tw`mt-5 bg-[#FDD043]`}
+                    labelStyle={tw`text-[#5597D1]`}
+                >
+                    Pay Now
+                </Button>
             </ScrollView>
             <Modal
                 isVisible={isModalVisible}
@@ -199,7 +284,7 @@ export default function PaperDetails({navigation}) {
                 onSwipeComplete={toggleModal}
                 style={globalStyle.bottomModal}
             >
-               <View style={globalStyle.modalContent}>
+               <ScrollView style={globalStyle.modalContent}>
           <View style={globalStyle.dragHandle} />
             <Text style={[tw`border-b-2 border-[#5597D1]`, { ...globalStyle.largeBoldText, ...globalStyle.heading_three }]}>Order Summary</Text>
             <View style={tw`my-3`}>
@@ -216,6 +301,7 @@ export default function PaperDetails({navigation}) {
               <Text style={globalStyle.order_description_text}>Urgency Charges : <Text  style={globalStyle.order_description_light_text}>${Urgency_Charges}</Text></Text>
               <Text style={globalStyle.order_description_text}>Unit Rate : <Text  style={globalStyle.order_description_light_text}>${Unit_Price}</Text></Text>
             </View>
+          {loading && <ActivityIndicator animating={true} color={MD2Colors.red800} />}  
             <View style={tw`my-5`}>
               <View style={tw`flex-row justify-between px-3 py-2 border-t-2 border-[#FDD043]`}>
                 <Text style={tw`font-bold text-[#5597D1]`}>Amount</Text>
@@ -226,11 +312,11 @@ export default function PaperDetails({navigation}) {
                 <Text style={tw`text-[#5597D1]`}>${Total}</Text>
               </View>
             </View>
-            <Button mode="contained" onPress={() => navigation.navigate('PaymentMethods')} buttonColor={appColors.SECONDARY} style={{ ...commonStyles.loginBtn }}>
+            <Button mode="contained" onPress={() => OrderCreate()} buttonColor={appColors.SECONDARY} style={{ ...commonStyles.loginBtn }}>
               GO TO PAYMENT METHODS
             </Button>
-        </View>
+        </ScrollView>
             </Modal>
         </View>
-    )
+    );
 }

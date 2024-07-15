@@ -98,6 +98,6 @@
     useDownloadAttachmentQuery,
     useGetCreateOrderQuery,
     useUploadFileMutation,
-    useOrderStoreMutation 
+    useCreateOrderMutation 
   } = apiService;
   export default apiService;
