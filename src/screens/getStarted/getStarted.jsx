@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View, Alert, Image } from 'react-native';
 import { Button, Chip } from 'react-native-paper';
 import tw from 'twrnc';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -9,6 +9,8 @@ import { globalStyle } from '../../styles/globalStyle';
 import commonStyles from '../auth/styles/styles';
 import { useGetCreateOrderQuery } from '../../services/apiService';
 import { setOrderData } from '../../redux/orderReducer';
+import nextIcon from '../../../assets/images/icons/next-icon.png'
+
 
 export default function GetStarted({ navigation }) {
   const { data, error, isLoading, isSuccess } = useGetCreateOrderQuery();
@@ -250,15 +252,17 @@ export default function GetStarted({ navigation }) {
         </View>
       </ScrollView>
       <View style={tw`bg-white`}>
-        <Button
-          mode="contained"
-          onPress={handleNextClick}
-          buttonColor={appColors.SECONDARY}
-          style={{ ...commonStyles.loginBtn }}
-        >
-          NEXT
-        </Button>
-      </View>
+      <Button
+        mode="contained"
+        onPress={handleNextClick}
+        buttonColor={appColors.SECONDARY}
+        style={{ ...commonStyles.loginBtn }}
+        contentStyle={{ flexDirection: 'row-reverse' }}
+        icon={() => <Image source={nextIcon} style={{ width: 20, height: 20, position: 'absolute', left: 100, top: '0%', transform: [{ translateY: -10 }] }} />}
+      >
+        NEXT
+      </Button>
+    </View>
     </View>
   );
 }

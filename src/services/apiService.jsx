@@ -53,7 +53,7 @@
           body: { email, token },
         }),
       }),
-      getOrderDetails: builder.query({
+      getOrderlist: builder.query({
         query: () => '/order/datatable',
       }),
       getOrderDetail: builder.query({
@@ -93,11 +93,11 @@
     useRegisterMutation,
     useVerifyOtpMutation,
     useResetPasswordMutation,
-    useGetOrderDetailsQuery,
     useGetOrderDetailQuery,
     useDownloadAttachmentQuery,
     useGetCreateOrderQuery,
     useUploadFileMutation,
-    useCreateOrderMutation 
+    useCreateOrderMutation,
+    useGetOrderlistQuery
   } = apiService;
   export default apiService;

@@ -6,10 +6,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-native-modal';
 import Checkbox from 'expo-checkbox';
 import uploadicon from '../../../assets/images/icons/upload.png';
+import nextIcon from '../../../assets/images/icons/next-icon.png'
 import { setOrderData, setUploadedFile } from '../../redux/orderReducer';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { globalStyle } from '../../styles/globalStyle';
+
 import { appColors } from '../../util/constant';
 import commonStyles from '../auth/styles/styles';
 import { useCreateOrderMutation } from '../../services/apiService';
@@ -31,9 +33,12 @@ export default function PaperDetails({ navigation }) {
     const orderData = useSelector((state) => state.order);
     console.log(orderData,'orderData');
     const [createOrder, { isLoading }] = useCreateOrderMutation();
-    useEffect(() => {
-        console.log('Order Data:', orderData);
-    }, [orderData]);
+
+
+    // useEffect(() => {
+    //     console.log('Order Data:', orderData);
+    // }, [orderData]);
+
     const pickDocument = async () => {
         if (isPickingDocument) {
             return;
@@ -221,15 +226,15 @@ export default function PaperDetails({ navigation }) {
         }
     };
     return (
-        <View style={[tw`flex-1`, globalStyle.main]}>
-            <ScrollView contentContainerStyle={tw`py-4 px-5`} style={globalStyle.curve_container}>
-                <Text style={[tw`font-bold text-[#5597D1] text-xl mb-5`]}>Step 2/3 ADDITIONAL PAPER DETAILS</Text>
-                <TextInput
+        <View style={[tw`flex-1`, { ...globalStyle.main }]}>
+            <ScrollView contentContainerStyle={commonStyles.container2} style={globalStyle.curve_container}>
+              <Text style={[tw`font-bold`, { ...globalStyle.heading_four }]}>Step 1/3 TYPE OF WORK AND DEADLINE</Text>
+              <TextInput
                     label="Title *"
                     value={title}
                     onChangeText={(title) => setTitle(title)}
-                    mode="outlined"
-                    style={tw`mb-3`}
+                    mode='flat'
+                    style={{ ...globalStyle.input,}}
                     error={!!errors.title}
                 />
                 {errors.title ? <Text style={tw`text-red-500 mb-3`}>{errors.title}</Text> : null}
@@ -237,25 +242,31 @@ export default function PaperDetails({ navigation }) {
                     label="Specific Instructions *"
                     value={Instructions}
                     onChangeText={(instructions) => setInstructions(instructions)}
-                    mode="outlined"
+                    mode='flat'
                     multiline
-                    numberOfLines={4}
-                    style={tw`mb-3`}
+                    style={{ ...globalStyle.input,}}
                     error={!!errors.instructions}
                 />
                 {errors.instructions ? <Text style={tw`text-red-500 mb-3`}>{errors.instructions}</Text> : null}
-                <Button
-                    mode="contained"
-                    icon={() => <Image source={uploadicon} style={{ width: 30, height: 30 }} />}
-                    onPress={pickDocument}
-                    loading={loading || isPickingDocument}
-                    disabled={loading || isPickingDocument}
-                    style={tw`mt-3`}
-                >
-                    Upload File
-                </Button>
-                {document ? <Text style={tw`mt-3 text-gray-700`}>Uploaded File: {document}</Text> : null}
-                {errors.terms ? <Text style={tw`text-red-500 mt-3`}>{errors.terms}</Text> : null}
+                <View style={tw`my-5`}>  
+                  <Button
+                      mode="contained"
+                      icon={() => <Image source={uploadicon} style={{ width: 30, height: 30 }} />}
+                      onPress={pickDocument}
+                      textColor="#000"
+                      buttonColor="#EFEEEE"
+                      loading={loading || isPickingDocument}
+                      disabled={loading || isPickingDocument}
+                      style={tw`mt-3`}
+                  >
+                      Upload File
+                  </Button>
+                  {document ? <Text style={tw`mt-3 text-gray-700`}>Uploaded File: {document}</Text> : null}
+                  {errors.terms ? <Text style={tw`text-red-500 mt-3`}>{errors.terms}</Text> : null}
+                </View>
+               
+                <Text style={tw`color-[#5597D1] my-2 text-[12px] font-semibold`}>Previous</Text>
+  
                 <View style={tw`flex-row items-center mt-3`}>
                     <Checkbox
                         value={isSelected}
@@ -267,16 +278,21 @@ export default function PaperDetails({ navigation }) {
                         I agree to the Terms and Conditions and Privacy Policy
                     </Text>
                 </View>
-                <Button
-                    mode="contained"
-                    onPress={handleNextClick}
-                    disabled={loading}
-                    style={tw`mt-5 bg-[#FDD043]`}
-                    labelStyle={tw`text-[#5597D1]`}
-                >
-                    Pay Now
-                </Button>
+             
             </ScrollView>
+            <View style={tw`bg-white`}>
+              <Button
+                mode="contained"
+                onPress={handleNextClick}
+                buttonColor={appColors.SECONDARY}
+                style={{ ...commonStyles.loginBtn }}
+                contentStyle={{ flexDirection: 'row-reverse' }}
+                icon={() => <Image source={nextIcon} style={{ width: 20, height: 20, position: 'absolute', left: 100, top: '0%', transform: [{ translateY: -10 }] }} />}
+                >
+                NEXT
+              </Button>
+            </View>
+            
             <Modal
                 isVisible={isModalVisible}
                 onBackdropPress={toggleModal}
@@ -284,12 +300,12 @@ export default function PaperDetails({ navigation }) {
                 onSwipeComplete={toggleModal}
                 style={globalStyle.bottomModal}
             >
-               <ScrollView style={globalStyle.modalContent}>
-          <View style={globalStyle.dragHandle} />
+          <View style={globalStyle.modalContent}>
+            <View style={globalStyle.dragHandle} />
             <Text style={[tw`border-b-2 border-[#5597D1]`, { ...globalStyle.largeBoldText, ...globalStyle.heading_three }]}>Order Summary</Text>
             <View style={tw`my-3`}>
               <Text style={tw`text-[16px] font-bold text-[#5597D1]`}>Service</Text>
-              <Text style={tw`text-[13px] font-semibold text-[#5597D1]`}>{orderData.serviceType?.name}</Text>
+              <Text style={tw`text-[13px] font-semibold text-[#5597D1]`}>{orderData?.serviceType?.name}</Text>
               <Text style={tw`text-[10px] text-[#5597D1]`}> {orderData.workLevel?.name} Work level</Text>
             </View>
             <View style={tw`my-2`}>
@@ -312,10 +328,17 @@ export default function PaperDetails({ navigation }) {
                 <Text style={tw`text-[#5597D1]`}>${Total}</Text>
               </View>
             </View>
-            <Button mode="contained" onPress={() => OrderCreate()} buttonColor={appColors.SECONDARY} style={{ ...commonStyles.loginBtn }}>
+            <Button 
+              mode="contained" 
+              onPress={() => OrderCreate()} 
+              buttonColor={appColors.SECONDARY} 
+              style={{ ...commonStyles.loginBtn }}
+              contentStyle={{ flexDirection: 'row-reverse' }}
+              icon={() => <Image source={nextIcon} style={{ width: 20, height: 20, position: 'absolute', left:10, top: '0%', transform: [{ translateY: -10 }] }} />}
+              >
               GO TO PAYMENT METHODS
             </Button>
-        </ScrollView>
+          </View>
             </Modal>
         </View>
     );
