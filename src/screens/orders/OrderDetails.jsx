@@ -30,8 +30,22 @@ export default function OrderDetails({ navigation }) {
     );
   }
 
-  const list = data?.result?.data?.data || [];
+  const list = data?.result?.data || [];
 
+  const statusColors = {
+    'New': '#007bff', // Primary
+    'In progress': '#17a2b8', // Info
+    'Submitted for approval': '#17a2b8', // Info
+    'Requested for revision': '#ffc107', // Warning
+    'Completed': '#28a745', // Success
+    'On hold': '#6c757d', // Secondary
+    'Canceled': '#343a40', // Dark
+    'Refunded': '#F53B00', // Danger
+    'Payment needs approval': '#F53B00', // Danger
+    'Payment Disapproved': '#343a40', // Dark
+    'Pending Payment':'#F53B00'
+  };
+  
   return (
     <View style={tw`bg-[#FDD043] flex-1`}>
       <View style={globalStyle.curve_container}>
@@ -72,8 +86,8 @@ export default function OrderDetails({ navigation }) {
               </Text>
               <View style={{ ...globalStyle.card_cta }}>
                 <View>
-                  <Text style={[tw`tracking-[2px] text-[12px]`]}>
-                    {order.order_status_id}
+                    <Text style={[tw`tracking-[1px] text-[10px]`, { color: statusColors[order.status] }]}>
+                        {order.status}
                   </Text>
                 </View>
                 <View>
@@ -81,6 +95,7 @@ export default function OrderDetails({ navigation }) {
                     style={tw`tracking-[2px] text-[#000000] bg-[#FDD043] px-3`}
                     onPress={() => navigation.navigate('OrderSummary', { orderId: order.id })}
                     textColor="#000"
+                
                   >
                     View More
                   </Button>
@@ -100,7 +115,7 @@ export default function OrderDetails({ navigation }) {
           buttonColor={appColors.SECONDARY}
           style={[tw`mt-5`, { ...commonStyles.loginBtn }]}
         >
-          CREATE
+          CREATE ORDER
         </Button>
       </View>
     </View>

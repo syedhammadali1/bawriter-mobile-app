@@ -17,7 +17,7 @@ export default function SplashScreen({ navigation }) {
 
       <View style={styles.middleContainer}>
         <Image
-          source={require('../../../assets/images/logo.png')} // Logo ka path yahan daalain
+          source={require('../../../assets/images/logo.png')} // Logo path
           style={styles.logo}
           resizeMode="contain"
         />
@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 250, // Adjust size as needed
     height: 250,
-    marginBottom: 20, // Space between logo and loader
   },
   loader: {
     marginTop: 20, // Space between logo and loader

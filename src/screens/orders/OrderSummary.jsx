@@ -9,7 +9,9 @@ import { appColors } from '../../util/constant';
 import messageIcon from '../../../assets/images/icons/msg.png';
 import descIcon from '../../../assets/images/icons/desc.png';
 import dollarIcon from '../../../assets/images/icons/finance.png';
-import { useDownloadAttachmentQuery, useGetOrderDetailQuery } from '../../services/apiService';
+import { useGetOrderDetailQuery } from '../../services/apiService';
+import * as FileSystem from 'expo-file-system';
+
 
 import moment from 'moment/moment';
 
@@ -18,15 +20,16 @@ export default function OrderSummary({ route, navigation }) {
   const { orderId } = route.params || {};
 
   const [attachmentId, setAttachmentId] = useState(null);
-  const { data: attachmentData } = useDownloadAttachmentQuery(attachmentId);
 
-  useEffect(() => {
-    if (attachmentData) {
-      // Handle attachment download logic here
-      const url = URL.createObjectURL(new Blob([attachmentData], { type: 'application/pdf' }));
-      Linking.openURL(url);
+  const downloadAttachment = async (url, displayName) => {
+    const downloadDest = `${FileSystem.documentDirectory}${displayName}`;
+    try {
+      const { uri } = await FileSystem.downloadAsync(url, downloadDest);
+      alert('Success', `Attachment downloaded to: ${uri}`);
+    } catch (err) {
+      alert('Error', `Failed to download attachment: ${err.message}`);
     }
-  }, [attachmentData]);
+  };
 
   if (!orderId) {
     return (
@@ -55,7 +58,8 @@ export default function OrderSummary({ route, navigation }) {
 
     const formattedPostedDate = data && moment(data.result.data.created_at).format('Do MMM YYYY');
     const formattedDeadlineDate = data && moment(data.result.data.dead_line).format('Do MMM YYYY');
-
+    
+    const attachments = data.result.data.order_attachments || [];
 
 
     // Render different screens based on selectedScreen
@@ -86,12 +90,25 @@ export default function OrderSummary({ route, navigation }) {
             <Text style={globalStyle.order_description_text}> Deadline Date : {formattedDeadlineDate}</Text>
             <Text style={globalStyle.order_description_text}> Price per Page : {data.result.data.unit_price}</Text>
             <Text style={globalStyle.order_description_text}> Quantity : {data.result.data.quantity} </Text>
-            <Text style={globalStyle.order_description_text}> Spacing Type : {data.result.data.spacing_type}</Text>
+            {/* <Text style={globalStyle.order_description_text}> Spacing Type : {data.result.data.spacing_type}</Text> */}
               <View style={tw`pt-5`}>
-                <Text style={tw`mb-5 text-center`}>File Attachment</Text>
-                <Button mode="outlined" onPress={() => setAttachmentId(data.result.data.id)} style={tw`mx-10`} textColor='#000'>
-                  Download Attachment
-                </Button>
+              {attachments.length > 0 ? (
+              attachments.map((attachment, index) => (
+                <View key={index} style={tw`mb-4`}>
+                  <Text style={tw`mb-5 text-center`}>File Attachment: {attachment.display_name}</Text>
+                  <Button
+                    mode="outlined"
+                    onPress={() => downloadAttachment(attachment.name, attachment.display_name)}
+                    style={tw`mx-10`}
+                    textColor='#000'
+                  >
+                    Download Attachment
+                  </Button>
+                </View>
+              ))
+            ) : (
+              <Text style={tw`text-center`}>No attachments found</Text>
+            )}
               </View>
           </View>
           

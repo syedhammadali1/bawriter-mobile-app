@@ -74,7 +74,7 @@ function LogIn({ navigation }) {
               setEmailError("");
               setPasswordError("");
               setGeneralError("");
-              navigation.navigate('getStarted');
+              navigation.navigate('OrderDetails');
 
             } else {
               if (response && response.status_code === 401) {
