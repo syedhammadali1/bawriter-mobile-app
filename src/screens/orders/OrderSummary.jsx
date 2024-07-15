@@ -79,13 +79,13 @@ export default function OrderSummary({ route, navigation }) {
       case 'Details':
         return (
           <>
-          <View style={tw`bg-gray-300 px-3 py-5 mt-5 rounded shadow-lg shadow-slate-700 mb-10`}>
+          <View style={tw`bg-gray-300 px-3 py-5 mt-5 rounded shadow-lg shadow-slate-700 mt-10`}>
             <Text style={tw`text-[15px] font-bold text-center mb-5`}>Project Code : {data.result.data.number}</Text>
             <Text style={globalStyle.order_description_text}> Project Title : {data.result.data.title}</Text>
             <Text style={globalStyle.order_description_text}> Posted Date : {formattedPostedDate}</Text>
             <Text style={globalStyle.order_description_text}> Deadline Date : {formattedDeadlineDate}</Text>
             <Text style={globalStyle.order_description_text}> Price per Page : {data.result.data.unit_price}</Text>
-            <Text style={globalStyle.order_description_text}> Quantity : {data.result.data.quantity} {data.result.data.unit_name}</Text>
+            <Text style={globalStyle.order_description_text}> Quantity : {data.result.data.quantity} </Text>
             <Text style={globalStyle.order_description_text}> Spacing Type : {data.result.data.spacing_type}</Text>
               <View style={tw`pt-5`}>
                 <Text style={tw`mb-5 text-center`}>File Attachment</Text>
@@ -95,9 +95,9 @@ export default function OrderSummary({ route, navigation }) {
               </View>
           </View>
           
-          <Button mode="contained" onPress={() => navigation.navigate('getStarted')} buttonColor={appColors.SECONDARY} style={commonStyles.loginBtn}>
+          {/* <Button mode="contained" onPress={() => navigation.navigate('getStarted')} buttonColor={appColors.SECONDARY} style={commonStyles.loginBtn}>
             Continue
-          </Button>
+          </Button> */}
         </>
         );
       case 'Cash':
@@ -142,7 +142,7 @@ export default function OrderSummary({ route, navigation }) {
             onPress={() => setSelectedScreen('Details')}
             style={[
               tw`bg-[#5597D1] rounded-lg py-3 px-4 shadow-lg shadow-slate-700`,
-              selectedScreen === 'Script' ? tw`opacity-50` : tw`opacity-100`
+              selectedScreen === 'Details' ? tw`opacity-50` : tw`opacity-100`
             ]}
           >
             <Image source={descIcon} />

@@ -20,6 +20,7 @@ import PaperDetails from './src/screens/paperDetails/PaperDetails';
 import { Provider } from 'react-redux';
 import store from './src/store';
 import PayPalWebView from './src/services/PayPalWebView';
+import SplashScreen from './src/screens/splash/SplashScreen';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -35,7 +36,7 @@ export default function App() {
       <NavigationContainer theme={MyTheme}>
         <PaperProvider >
           <View style={styles.container}>
-            <Stack.Navigator initialRouteName="LogIn" 
+            <Stack.Navigator initialRouteName="Splash" 
               screenOptions={{ 
                 headerStyle:{
                   backgroundColor:appColors.PRIMARY,
@@ -57,7 +58,7 @@ export default function App() {
             >
           
               <Stack.Screen name="LogIn" component={LogIn}options={{ title: 'LOGIN' }} />
-  
+              <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
                <Stack.Screen name="PayPalPayment" component={PayPalWebView} />
               <Stack.Screen name="Register" component={Register}  options={{ title: 'REGISTER' }} />
                <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{title:'Forget Password'}}/>

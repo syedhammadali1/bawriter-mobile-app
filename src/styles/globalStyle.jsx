@@ -151,7 +151,7 @@ export const globalStyle = StyleSheet.create({
            color:'#000',
     },
     order_card:{
-        padding:10,
+        padding:12,
         backgroundColor:'white',
         borderWidth:2,
         borderColor:'#5597D1',

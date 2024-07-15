@@ -84,6 +84,13 @@
 
         }),
       }),
+      postcomment: builder.mutation({
+        query: ({message})=>({
+          url:'/order/comment',
+          method: 'POST',
+          body: message
+        })
+      })
     }),
   });
 
@@ -98,6 +105,7 @@
     useGetCreateOrderQuery,
     useUploadFileMutation,
     useCreateOrderMutation,
-    useGetOrderlistQuery
+    useGetOrderlistQuery,
+    usePostcommentMutation
   } = apiService;
   export default apiService;
