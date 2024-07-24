@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "y"
     },
     "android": {
       "adaptiveIcon": {
@@ -44,8 +45,8 @@
           "iCloudContainerEnvironment": "Production"
         }
       ],
-
-      "expo-font"
+      "expo-font",
+      "expo-asset"
     ]
   }
 }

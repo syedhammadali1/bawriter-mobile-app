@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Pressable, Image, Text, Linking  } from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, Pressable, Image, Text, Alert, Platform } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import tw from 'twrnc';
 import AuthHeader from '../../components/auth/AuthHeader';
@@ -11,28 +11,62 @@ import descIcon from '../../../assets/images/icons/desc.png';
 import dollarIcon from '../../../assets/images/icons/finance.png';
 import { useGetOrderDetailQuery } from '../../services/apiService';
 import * as FileSystem from 'expo-file-system';
-
-
+import * as Sharing from 'expo-sharing';
+import * as MediaLibrary from 'expo-media-library';
 import moment from 'moment/moment';
-
 
 export default function OrderSummary({ route, navigation }) {
   const { orderId } = route.params || {};
+  const { data, error, isLoading } = useGetOrderDetailQuery(orderId);
 
-  const downloadAttachment = async (url, displayName) => {
-    const downloadDest = `${FileSystem.documentDirectory}${displayName}`;
-  
-    try {
-      const { uri } = await FileSystem.downloadAsync(url, downloadDest);
-      alert('Success', `Attachment downloaded to: ${uri}`);
-    } catch (err) {
-      console.error('Download error:', err);
-      alert('Error', `Failed to download attachment: ${err.message}`);
+  const [selectedScreen, setSelectedScreen] = useState('Details');
+  const [text, setText] = useState('');
+
+  const getPermissionAsync = async () => {
+    if (Platform.OS !== 'web') {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Sorry, we need media library permissions to make this work!');
+        return false;
+      }
     }
+    return true;
   };
 
-  console.log(FileSystem.documentDirectory);
+  const downloadAttachment = async (url, displayName) => {
+    const permission = await getPermissionAsync();
+    if (!permission) return;
 
+    const downloadDest = `${FileSystem.documentDirectory}${displayName}`;
+    console.log(`Downloading from URL: ${url}`);
+    console.log(`Saving to: ${downloadDest}`);
+
+    try {
+      // Download the file
+      const { uri } = await FileSystem.downloadAsync(url, downloadDest);
+      console.log(`File downloaded to: ${uri}`);
+
+      // Check if the file exists
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      console.log('Downloaded file info:', fileInfo);
+
+      if (!fileInfo.exists) {
+        throw new Error('File download failed');
+      }
+
+      Alert.alert('Success', `Attachment downloaded to: ${uri}`);
+
+      // Attempt to share the file
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri);
+      } else {
+        Alert.alert('Sharing not available', 'File downloaded successfully but sharing is not available on this device.');
+      }
+    } catch (err) {
+      console.error('Download error:', err);
+      Alert.alert('Error', `Failed to download attachment: ${err.message}`);
+    }
+  };
 
   if (!orderId) {
     return (
@@ -42,15 +76,9 @@ export default function OrderSummary({ route, navigation }) {
     );
   }
 
-  const { data, error, isLoading } = useGetOrderDetailQuery(orderId);
 
 
-
-  const [selectedScreen, setSelectedScreen] = useState('Details');
-  const [text, setText] = useState('');
-  // console.log(data)
   const renderScreen = () => {
-    // Handle loading and error states
     if (isLoading) {
       return <Text>Loading...</Text>;
     }
@@ -61,11 +89,8 @@ export default function OrderSummary({ route, navigation }) {
 
     const formattedPostedDate = data && moment(data.result.data.created_at).format('Do MMM YYYY');
     const formattedDeadlineDate = data && moment(data.result.data.dead_line).format('Do MMM YYYY');
-
     const attachments = data.result.data.order_attachments || [];
 
-
-    // Render different screens based on selectedScreen
     switch (selectedScreen) {
       case 'Message':
         return (
@@ -86,39 +111,34 @@ export default function OrderSummary({ route, navigation }) {
       case 'Details':
         return (
           <>
-          <View style={tw`bg-gray-300 px-3 py-5 mt-5 rounded shadow-lg shadow-slate-700 mt-10`}>
-            <Text style={tw`text-[15px] font-bold text-center mb-5`}>Project Code : {data.result.data.order_no}</Text>
-            <Text style={globalStyle.order_description_text}> Project Title : {data.result.data.title}</Text>
-            <Text style={globalStyle.order_description_text}> Posted Date : {formattedPostedDate}</Text>
-            <Text style={globalStyle.order_description_text}> Deadline Date : {formattedDeadlineDate}</Text>
-            <Text style={globalStyle.order_description_text}> Price per Page : {data.result.data.unit_price}</Text>
-            <Text style={globalStyle.order_description_text}> Quantity : {data.result.data.quantity} </Text>
-            {/* <Text style={globalStyle.order_description_text}> Spacing Type : {data.result.data.spacing_type}</Text> */}
+            <View style={tw`bg-gray-300 px-3 py-5 mt-5 rounded shadow-lg shadow-slate-700 mt-10`}>
+              <Text style={tw`text-[15px] font-bold text-center mb-5`}>Project Code : {data.result.data.order_no}</Text>
+              <Text style={globalStyle.order_description_text}> Project Title : {data.result.data.title}</Text>
+              <Text style={globalStyle.order_description_text}> Posted Date : {formattedPostedDate}</Text>
+              <Text style={globalStyle.order_description_text}> Deadline Date : {formattedDeadlineDate}</Text>
+              <Text style={globalStyle.order_description_text}> Price per Page : {data.result.data.unit_price}</Text>
+              <Text style={globalStyle.order_description_text}> Quantity : {data.result.data.quantity} </Text>
               <View style={tw`pt-5`}>
-              {attachments.length > 0 ? (
-              attachments.map((attachment, index) => (
-                <View key={index} style={tw`mb-4`}>
-                  <Text style={tw`mb-5 text-center`}>File Attachment: {attachment.display_name}</Text>
-                  <Button
-  mode="outlined"
-  onPress={() => downloadAttachment(data.result.data.order_attachments[0].name, data.result.data.order_attachments[0].display_name)}
-  style={tw`mx-10`}
-  textColor='#000'>
-  Download Attachment
-</Button>
-
-                </View>
-              ))
-            ) : (
-              <Text style={tw`text-center`}>No attachments found</Text>
-            )}
+                {attachments.length > 0 ? (
+                  attachments.map((attachment, index) => (
+                    <View key={index} style={tw`mb-4`}>
+                      <Text style={tw`mb-5 text-center`}>File Attachment: {attachment.display_name}</Text>
+                      <Button
+                        mode="outlined"
+                        onPress={() => downloadAttachment(attachment.name, attachment.display_name)}
+                        style={tw`mx-10`}
+                        textColor='#000'
+                      >
+                        Download Attachment
+                      </Button>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={tw`text-center`}>No attachments found</Text>
+                )}
               </View>
-          </View>
-          
-          {/* <Button mode="contained" onPress={() => navigation.navigate('getStarted')} buttonColor={appColors.SECONDARY} style={commonStyles.loginBtn}>
-            Continue
-          </Button> */}
-        </>
+            </View>
+          </>
         );
       case 'Cash':
         return (

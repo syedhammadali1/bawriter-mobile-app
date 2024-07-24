@@ -9,6 +9,8 @@ import { globalStyle } from '../../styles/globalStyle';
 import { appColors } from '../../util/constant';
 import searchicon from '../../../assets/images/icons/search-icon.png';
 import { useGetOrderlistQuery } from '../../services/apiService';
+import { DotIndicator } from 'react-native-indicators';
+
 
 export default function OrderDetails({ navigation }) {
   const { data, error, isLoading, refetch } = useGetOrderlistQuery(2);
@@ -28,7 +30,7 @@ export default function OrderDetails({ navigation }) {
   if (isLoading && !refreshing) {
     return (
       <View style={tw`flex-1 justify-center items-center`}>
-        <Text>Loading...</Text>
+          <DotIndicator color="#FDD043" count={5} size={10}/>
       </View>
     );
   }

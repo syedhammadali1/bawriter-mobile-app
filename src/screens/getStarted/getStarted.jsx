@@ -10,6 +10,8 @@ import commonStyles from '../auth/styles/styles';
 import { useGetCreateOrderQuery } from '../../services/apiService';
 import { setOrderData } from '../../redux/orderReducer';
 import nextIcon from '../../../assets/images/icons/next-icon.png'
+import { DotIndicator } from 'react-native-indicators';
+
 
 
 export default function GetStarted({ navigation }) {
@@ -103,7 +105,7 @@ export default function GetStarted({ navigation }) {
   if (isLoading) {
     return (
       <View style={tw`flex-1 justify-center items-center`}>
-        <Text>Loading...</Text>
+               <DotIndicator color="#FDD043" count={5} size={10} />
       </View>
     );
   }
